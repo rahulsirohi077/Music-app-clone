@@ -3,6 +3,7 @@ import { Button, Container, IconButton, InputLabel, Paper, TextField, Typography
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { signUp } from '../apis/userAPI'
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -19,17 +20,18 @@ const SignUp = () => {
         confirmPassword: '',
     })
 
-    const handleLogin = (e) => {
+    const handleSignUp = (e) => {
         e.preventDefault()
         if (validateSignUpForm()) {
-            toast.success("SignUp Successful")
-            setTimeout(() => {
-                navigate("/")
-            }, 5000)
-            console.log("username ", formData.username);
-            console.log("email ", formData.email);
-            console.log("password ", formData.password);
-            console.log("confirmPassword ", formData.confirmPassword);
+            signUp(formData);
+            // toast.success("SignUp Successful")
+            // setTimeout(() => {
+            //     navigate("/")
+            // }, 5000)
+            // console.log("username ", formData.username);
+            // console.log("email ", formData.email);
+            // console.log("password ", formData.password);
+            // console.log("confirmPassword ", formData.confirmPassword);
         }
     }
 
@@ -93,7 +95,7 @@ const SignUp = () => {
                             marginTop: "1rem",
                             width: "100%",
                         }}
-                        onSubmit={handleLogin}
+                        onSubmit={handleSignUp}
                     >
                         {/* username field */}
                         <InputLabel htmlFor="username" >Username</InputLabel>
