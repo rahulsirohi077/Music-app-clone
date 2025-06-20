@@ -12,7 +12,7 @@ dotenv.config({
     path:'./.env',
 });
 
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env.MONGO_URL;
 
 connectDB(mongoUri)
 

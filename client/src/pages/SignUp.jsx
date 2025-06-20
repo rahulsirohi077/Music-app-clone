@@ -20,18 +20,20 @@ const SignUp = () => {
         confirmPassword: '',
     })
 
-    const handleSignUp = (e) => {
+    const handleSignUp = async(e) => {
         e.preventDefault()
         if (validateSignUpForm()) {
-            signUp(formData);
-            // toast.success("SignUp Successful")
-            // setTimeout(() => {
-            //     navigate("/")
-            // }, 5000)
-            // console.log("username ", formData.username);
-            // console.log("email ", formData.email);
-            // console.log("password ", formData.password);
-            // console.log("confirmPassword ", formData.confirmPassword);
+            const toastId = toast.loading("Loading...")
+            const response = await signUp(formData);
+            if(response.success){
+                toast.success("SignUp Successful",{id:toastId})
+                setTimeout(() => {
+                    navigate("/")
+                }, 5000)
+            }
+            else{
+                toast.error(response?.message || "Something Went Wrong",{id:toastId})
+            }
         }
     }
 
@@ -85,7 +87,7 @@ const SignUp = () => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         padding: 3,
-                        height:"100%",
+                        height:"80%",
                         overflow:'auto'
                     }}
                 >
