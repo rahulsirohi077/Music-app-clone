@@ -20,9 +20,12 @@ const login = async (req, res) => {
       });
     }
 
+    console.log({userNameOrEmail,password})
+
     const user = await User.findOne({
-      $or: [{ name: userNameOrEmail }, { email: userNameOrEmail }],
+      $or: [{ username: userNameOrEmail }, { email: userNameOrEmail }],
     });
+    console.log(user)
 
     if (!user) {
       return res.status(401).json({
@@ -40,7 +43,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "15d" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15d" });
 
     return res.status(200).cookie("Token", token, cookieOptions).json({
       success: true,
@@ -113,6 +116,7 @@ const signUp = async (req, res) => {
       message: "User Sign In Successfully",
     });
   } catch (error) {
+    console.log(error)
     return res.status(401).json({
       success: false,
       message: error.message,

@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Button, Container, IconButton, InputLabel, Paper, TextField, Typography } from "@mui/material"
-import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { signUp } from '../apis/userAPI'
@@ -23,17 +22,9 @@ const SignUp = () => {
     const handleSignUp = async(e) => {
         e.preventDefault()
         if (validateSignUpForm()) {
-            const toastId = toast.loading("Loading...")
-            const response = await signUp(formData);
-            if(response.success){
-                toast.success("SignUp Successful",{id:toastId})
-                setTimeout(() => {
-                    navigate("/")
-                }, 5000)
-            }
-            else{
-                toast.error(response?.message || "Something Went Wrong",{id:toastId})
-            }
+            
+            await signUp(formData,navigate);
+            
         }
     }
 

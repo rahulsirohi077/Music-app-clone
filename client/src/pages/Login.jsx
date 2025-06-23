@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Button, Container, IconButton, InputLabel, Paper, TextField, Typography } from "@mui/material"
-import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { login } from '../apis/userAPI'
 
 const Login = () => {
     const navigate = useNavigate();
@@ -11,18 +11,13 @@ const Login = () => {
     
 
     const [formData, setFormData] = useState({
-        usernameOrEmail: '',
+        userNameOrEmail: '',
         password: ''
     })
 
-    const handleLogin = (e) => {
+    const handleLogin = async(e) => {
         e.preventDefault()
-        toast.success("Login Successful")
-        setTimeout(() => {
-            navigate("/")
-        }, 5000)
-        console.log("usernameOrEmail ",formData.usernameOrEmail);
-        console.log("password ",formData.password);
+        await login(formData,navigate)
     }
 
     return (
@@ -61,8 +56,8 @@ const Login = () => {
                             required
                             fullWidth
                             // label={"Username/Email"}
-                            value={formData.usernameOrEmail}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, usernameOrEmail: e.target.value }))}
+                            value={formData.userNameOrEmail}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, userNameOrEmail: e.target.value }))}
                             variant='outlined'
                         />
                         <InputLabel htmlFor="password">Password</InputLabel>
