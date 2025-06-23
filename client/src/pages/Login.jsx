@@ -1,23 +1,24 @@
 import React, { useState } from 'react'
-import { Button, Container, IconButton, InputLabel, Paper, TextField, Typography } from "@mui/material"
+import { Button, Container, IconButton, InputLabel, Link, Paper, TextField, Typography } from "@mui/material"
 import { useNavigate } from 'react-router-dom'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { login } from '../apis/userAPI'
+import { useForm } from 'react-hook-form'
 
 const Login = () => {
     const navigate = useNavigate();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting},
+      } = useForm();
 
     const [showPassword, setShowPassword] = useState(false);
     
 
-    const [formData, setFormData] = useState({
-        userNameOrEmail: '',
-        password: ''
-    })
-
-    const handleLogin = async(e) => {
-        e.preventDefault()
-        await login(formData,navigate)
+    const handleLogin = async(data) => {
+        console.log("data=> ",data)
+        await login(data,navigate)
     }
 
     return (
@@ -47,33 +48,35 @@ const Login = () => {
                             marginTop: "1rem",
                             width: "100%",
                         }}
-                        onSubmit={handleLogin}
+                        onSubmit={handleSubmit(handleLogin)}
                     >
                         <InputLabel htmlFor="Username or Email" >Username or Email</InputLabel>
                         <TextField
                             id='username'
                             margin='normal'
-                            required
                             fullWidth
-                            // label={"Username/Email"}
-                            value={formData.userNameOrEmail}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, userNameOrEmail: e.target.value }))}
+                            {...register('userNameOrEmail',{required:"UserName Or Email is required"})}
                             variant='outlined'
+                            error={!!errors.userNameOrEmail}
+                            helperText={errors?.userNameOrEmail?.message}
+                            aria-invalid={!!errors.userNameOrEmail}
                         />
                         <InputLabel htmlFor="password">Password</InputLabel>
                         <TextField
                             id='password'
                             margin='normal'
-                            required
                             fullWidth
-                            // label={"password"}
                             variant='outlined'
                             type={showPassword ? "text" : "password"}
-                            value={formData.password}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                            {...register('password',{required:"Password is Required"})}
+                            error={errors?.password}
+                            helperText={errors?.password?.message}
+                            aria-invalid={!!errors.password}
                             slotProps={{
                                 input: {
-                                    endAdornment: <IconButton onClick={() => setShowPassword((prev) => !prev)}>
+                                    endAdornment: <IconButton 
+                                    aria-label={showPassword?"Hide Password":"Show Password"}
+                                    onClick={() => setShowPassword((prev) => !prev)}>
                                         {showPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
                                 }
@@ -86,6 +89,8 @@ const Login = () => {
                             }}
                             fullWidth
                             type='submit'
+                            disabled={isSubmitting}
+                            aria-disabled={isSubmitting}
                         >
                             Login
                         </Button>
@@ -95,9 +100,9 @@ const Login = () => {
                         <Button 
                             fullWidth
                             variant='outlined'
-                            onClick={()=>navigate("/signup")}
+                            href='/signup'
                         >
-                            Sign Up
+                            Sign Up Instead
                         </Button>
                     </form>
                 </Paper>
