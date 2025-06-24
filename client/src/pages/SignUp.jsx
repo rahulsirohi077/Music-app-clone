@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Button,
   Container,
@@ -12,8 +12,10 @@ import { useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { signUp } from "../apis/userAPI";
 import { useForm } from "react-hook-form";
+import { UserContext } from "../context/UserContext";
 
 const SignUp = () => {
+  const {setUser} = useContext(UserContext);
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +30,7 @@ const SignUp = () => {
 
   const handleSignUp = async (data) => {
     // console.log(data);
-    await signUp(data, navigate);
+    await signUp(data, navigate, setUser);
   };
 
   return (

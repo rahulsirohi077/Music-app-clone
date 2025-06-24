@@ -5,8 +5,7 @@ import jwt from "jsonwebtoken";
 const cookieOptions = {
   httpOnly: true,
   sameSite: "none",
-  secure: true, 
-  maxAge: 15 * 24 * 60 * 60 * 1000, 
+  secure: true,
 };
 
 const login = async (req, res) => {
@@ -20,12 +19,12 @@ const login = async (req, res) => {
       });
     }
 
-    console.log({userNameOrEmail,password})
+    console.log({ userNameOrEmail, password });
 
     const user = await User.findOne({
       $or: [{ username: userNameOrEmail }, { email: userNameOrEmail }],
     });
-    console.log(user)
+    console.log(user);
 
     if (!user) {
       return res.status(401).json({
@@ -43,12 +42,28 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15d" });
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    );
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "15d" }
+    );
 
-    return res.status(200).cookie("Token", token, cookieOptions).json({
-      success: true,
-      message: "User Logged In Successfully",
-    });
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .json({
+        success: true,
+        message: "User Logged In Successfully",
+      });
   } catch (error) {
     return res.status(401).json({
       success: false,
@@ -63,13 +78,6 @@ const signUp = async (req, res) => {
     // fetch data
     const { username, email, password, confirmPassword } = req.body;
 
-    // console.log("inside sign up function")
-    // return res.status(200).json({
-    //     success: true,
-    //     userDetails: {
-    //         username, email, password, confirmPassword
-    //     }
-    // })
     // validate
     if (!username || !email || !password || !confirmPassword) {
       return res.status(401).json({
@@ -107,16 +115,27 @@ const signUp = async (req, res) => {
     const payload = {
       id: user._id,
     };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "15d",
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "15m",
     });
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "15d" }
+    );
+    user.refreshToken = refreshToken;
+    await user.save();
     // send response back with cookie containing token
-    return res.status(201).cookie("Token", token, cookieOptions).json({
-      success: true,
-      message: "User Sign In Successfully",
-    });
+    return res
+      .status(201)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .json({
+        success: true,
+        message: "User Sign In Successfully",
+      });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(401).json({
       success: false,
       message: error.message,
@@ -124,4 +143,86 @@ const signUp = async (req, res) => {
   }
 };
 
-export { login, signUp };
+const getUser = async(req,res) =>{
+  try {
+
+    const user = await User.findById(req.user.id).select("-refreshToken");
+
+    if(!user){
+      return res.status(401).json({
+        success:false,
+        message:"User Does Not Exist"
+      })
+    }
+
+    return res.status(200).json({
+      success:true,
+      message:"User data Fetched Successfully",
+      user
+    })
+
+  } catch (error) {
+    return res.status(401).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
+
+const refreshTokens = async (req,res) => {
+
+ try {
+   const incomingRefreshToken = req.cookie.refreshToken;
+ 
+   const decoded = jwt.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECRET);
+
+   const user = await User.findById(decoded.id);
+
+   if(!user){
+    return res.status(401).json({
+      success:false,
+      message:"Invalid Refresh Token"
+    })
+   }
+
+   if(incomingRefreshToken !== user.refreshToken){
+    return res.status(401).json({
+      success:false,
+      message:"Refresh Token Expired"
+    })
+   }
+
+   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "15m",
+    });
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "15d" }
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return res
+      .status(201)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .json({
+        success: true,
+        message: "Tokens Refreshed Successfully",
+      });
+
+ } catch (error) {
+  console.log(error)
+  return res
+  .status(401)
+  .json({
+    success:false,
+    message:error.message
+  })
+
+ }
+}
+
+export { login, signUp, refreshTokens, getUser };

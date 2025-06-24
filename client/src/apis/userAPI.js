@@ -2,7 +2,11 @@ import toast from "react-hot-toast";
 import { apiconnector } from "./apiconnector";
 import { userEndpoints } from "./apis";
 
-const signUp = async ({ username, email, password, confirmPassword },navigate) => {
+const signUp = async (
+  { username, email, password, confirmPassword },
+  navigate,
+  setUser
+) => {
   const toastId = toast.loading("Loading...");
 
   try {
@@ -17,20 +21,25 @@ const signUp = async ({ username, email, password, confirmPassword },navigate) =
     if (response.data.success) {
       toast.success("SignUp Successful", { id: toastId });
       setTimeout(() => {
-        navigate('/')
+        navigate("/");
+        setUser(true);
       }, 5000);
     } else {
-      toast.error(response?.data?.message || "Something Went Wrong", { id: toastId });
+      toast.error(response?.data?.message || "Something Went Wrong", {
+        id: toastId,
+      });
     }
 
     return response.data;
   } catch (error) {
-    toast.error(error?.response?.data?.message || error.message, { id: toastId });
+    toast.error(error?.response?.data?.message || error.message, {
+      id: toastId,
+    });
     console.log(error);
   }
 };
 
-const login = async ({ userNameOrEmail, password },navigate) => {
+const login = async ({ userNameOrEmail, password }, navigate, setUser) => {
   const toastId = toast.loading("Loading...");
 
   try {
@@ -42,15 +51,30 @@ const login = async ({ userNameOrEmail, password },navigate) => {
     if (response.data.success) {
       toast.success("Login Successful", { id: toastId });
       setTimeout(() => {
-        navigate("/")
+        navigate("/");
+        setUser(true);
       }, 5000);
     } else {
       toast.error(response.data.message, { id: toastId });
     }
   } catch (error) {
-    toast.error(error?.response?.data?.message || error.message, { id: toastId });
+    toast.error(error?.response?.data?.message || error.message, {
+      id: toastId,
+    });
     console.log(error);
   }
 };
 
-export { signUp, login };
+const getUser = async (setUser,toastId) => {
+  try {
+    const response = await apiconnector("GET", userEndpoints.GETUSER_API);
+    setUser(response.data.user);
+    toast.dismiss(toastId);
+    return response.data;
+  } catch (error) {
+    toast.error(error?.response?.data?.message || error.message,{id:toastId});
+    console.log(error);
+  }
+};
+
+export { signUp, login, getUser };

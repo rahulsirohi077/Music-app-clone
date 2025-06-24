@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Button, Container, IconButton, InputLabel, Link, Paper, TextField, Typography } from "@mui/material"
 import { useNavigate } from 'react-router-dom'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { login } from '../apis/userAPI'
 import { useForm } from 'react-hook-form'
+import { UserContext } from '../context/UserContext'
 
 const Login = () => {
+    const {setUser} = useContext(UserContext);
     const navigate = useNavigate();
     const {
         register,
@@ -18,7 +20,7 @@ const Login = () => {
 
     const handleLogin = async(data) => {
         console.log("data=> ",data)
-        await login(data,navigate)
+        await login(data,navigate,setUser)
     }
 
     return (
@@ -50,7 +52,7 @@ const Login = () => {
                         }}
                         onSubmit={handleSubmit(handleLogin)}
                     >
-                        <InputLabel htmlFor="Username or Email" >Username or Email</InputLabel>
+                        <InputLabel htmlFor="username" >Username or Email</InputLabel>
                         <TextField
                             id='username'
                             margin='normal'
