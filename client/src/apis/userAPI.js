@@ -68,9 +68,8 @@ const login = async ({ userNameOrEmail, password }, navigate, setUser) => {
 const getUser = async (setUser,toastId) => {
   try {
     const response = await apiconnector("GET", userEndpoints.GETUSER_API);
-    setUser(response.data.user);
+    setUser(response?.data?.user);
     toast.dismiss(toastId);
-    return response.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || error.message,{id:toastId});
     console.log(error);

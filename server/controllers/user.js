@@ -19,12 +19,12 @@ const login = async (req, res) => {
       });
     }
 
-    console.log({ userNameOrEmail, password });
+    // console.log({ userNameOrEmail, password });
 
     const user = await User.findOne({
       $or: [{ username: userNameOrEmail }, { email: userNameOrEmail }],
     });
-    console.log(user);
+    // console.log(user);
 
     if (!user) {
       return res.status(401).json({
@@ -45,12 +45,12 @@ const login = async (req, res) => {
     const accessToken = jwt.sign(
       { id: user._id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME }
     );
     const refreshToken = jwt.sign(
       { id: user._id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "15d" }
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME }
     );
 
     user.refreshToken = refreshToken;
@@ -116,12 +116,12 @@ const signUp = async (req, res) => {
       id: user._id,
     };
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "15m",
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
     });
     const refreshToken = jwt.sign(
       { id: user._id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "15d" }
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME }
     );
     user.refreshToken = refreshToken;
     await user.save();
@@ -143,62 +143,75 @@ const signUp = async (req, res) => {
   }
 };
 
-const getUser = async(req,res) =>{
+const getUser = async (req, res) => {
   try {
-
     const user = await User.findById(req.user.id).select("-refreshToken");
 
-    if(!user){
+    if (!user) {
       return res.status(401).json({
-        success:false,
-        message:"User Does Not Exist"
-      })
+        success: false,
+        message: "User Does Not Exist",
+      });
     }
 
     return res.status(200).json({
-      success:true,
-      message:"User data Fetched Successfully",
-      user
-    })
-
+      success: true,
+      message: "User data Fetched Successfully",
+      user,
+    });
   } catch (error) {
     return res.status(401).json({
-      success:false,
-      message:error.message
-    })
-  }
-}
-
-const refreshTokens = async (req,res) => {
-
- try {
-   const incomingRefreshToken = req.cookie.refreshToken;
- 
-   const decoded = jwt.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECRET);
-
-   const user = await User.findById(decoded.id);
-
-   if(!user){
-    return res.status(401).json({
-      success:false,
-      message:"Invalid Refresh Token"
-    })
-   }
-
-   if(incomingRefreshToken !== user.refreshToken){
-    return res.status(401).json({
-      success:false,
-      message:"Refresh Token Expired"
-    })
-   }
-
-   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "15m",
+      success: false,
+      message: error.message,
     });
+  }
+};
+
+const refreshTokens = async (req, res) => {
+  try {
+    const incomingRefreshToken = req.cookies.refreshToken;
+
+    if (!incomingRefreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh Token is Missing",
+      });
+    }
+
+    const decoded = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    // console.log("decoded = ",decoded)
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Refresh Token",
+      });
+    }
+
+    if (incomingRefreshToken !== user.refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh Token Expired",
+      });
+    }
+
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
+      }
+    );
     const refreshToken = jwt.sign(
       { id: user._id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "15d" }
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME }
     );
 
     user.refreshToken = refreshToken;
@@ -212,17 +225,13 @@ const refreshTokens = async (req,res) => {
         success: true,
         message: "Tokens Refreshed Successfully",
       });
-
- } catch (error) {
-  console.log(error)
-  return res
-  .status(401)
-  .json({
-    success:false,
-    message:error.message
-  })
-
- }
-}
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 export { login, signUp, refreshTokens, getUser };
