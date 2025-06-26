@@ -15,6 +15,7 @@ function App() {
   console.log("User => ",user)
 
   useEffect(() => {
+    console.log("use Effect ran")
     let toastId;
     const getUserInfo = async () => {
       toastId = toast.loading("Loading...");
