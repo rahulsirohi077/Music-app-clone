@@ -13,7 +13,7 @@ axiosInstance.interceptors.response.use(
     console.log("error in interceptor ",error)
     const originalRequest = error.config
     if (
-      error.response.status === 401 &&
+      error?.response?.status === 401 &&
       originalRequest.url === userEndpoints.REFRESH_TOKENS_API
     ) {
       return Promise.reject(error)
