@@ -10,9 +10,14 @@ import {
   Typography,
 } from "@mui/material";
 import NavBar from "../components/shared/NavBar";
-import { grey, red } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import CardItem from "../components/shared/CardItem";
+import { artistData } from "../data/artists";
+import { genreData } from "../data/genre";
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import { chartsData } from "../data/charts";
 
 const Home = () => {
   const [liked, setLiked] = useState(false);
@@ -26,7 +31,7 @@ const Home = () => {
         sx={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
       >
         {/* hero Section */}
-        <Stack spacing={6}>
+        <Stack spacing={3}>
           <Typography variant="body1">Trending New Hits</Typography>
 
           <Stack>
@@ -86,19 +91,42 @@ const Home = () => {
             //   flex:1,
             //   flexDirection:"column"
             // }}
-            bgcolor={red[500]}
+            // bgcolor={red[500]}
           >
             {/* Artist section */}
             <Grid
               item
               size={12}
-              bgcolor={grey[500]}
+              bgcolor={"#212028"}
+              // height={"35%"}
               sx={{
-                // flex:1,
-                height:"30%"
+                // flex: 1,
+                height: "35%",
               }}
+              direction={"column"}
+              paddingX={2}
+              paddingTop={1}
+              borderRadius={3}
             >
-              Artist
+              <Typography variant="body1">Artist</Typography>
+              <Box
+                height={"90%"}
+                // width={"100%"}
+                display={"flex"}
+                // flexDirection={"row"}
+                justifyContent={"space-around"}
+                alignItems={"center"}
+              >
+                {artistData.map((data) => (
+                  <CardItem
+                    key={data.id}
+                    src={data.src}
+                    alt={data.alt}
+                    artistName={data.artistName}
+                    plays={data.plays}
+                  />
+                ))}
+              </Box>
             </Grid>
             {/* genre and top charts */}
             <Grid
@@ -107,25 +135,85 @@ const Home = () => {
               spacing={3}
               size={12}
               direction={"row"}
+              // height={"60%"}
               sx={{
-                flex:1,
-                // height:"60%"
+                flex: 1,
+                height: "60%",
               }}
             >
               {/* genre */}
-              <Grid item size={5} bgcolor={grey[500]}>
-                Genre
+              <Grid
+                item
+                size={5}
+                bgcolor={"#212028"}
+                padding={2}
+                borderRadius={3}
+                height={"100%"}
+              >
+                <Typography variant="body1">Genre</Typography>
+                <Grid container direction={"row"} height={"80%"} spacing={2} overflow={"auto"} mt={2}>
+                  {genreData.map((data) => (
+                    <Grid
+                      item
+                      key={data.id}
+                      bgcolor={data.bgColor}
+                      padding={1}
+                      size={6}
+                      borderRadius={3}
+                      display={"flex"}
+                      justifyContent={'center'}
+                      alignItems={"center"}
+                    >
+                      <Typography variant={"caption"} textAlign={"center"}>{data.title}</Typography>
+                    </Grid>
+                  ))}
+                </Grid>
               </Grid>
               {/* top charts */}
-              <Grid item size={7} bgcolor={grey[500]}>
-                Top Charts
+              <Grid
+                item
+                size={7}
+                bgcolor={"#212028"}
+                padding={2}
+                borderRadius={3}
+              >
+                <Typography variant="body1">Top Charts</Typography>
+                <Grid container direction={"column"}>
+                  {chartsData.map(data=>(
+                    <Grid container key={data.id} direction={"row"} width={"100%"} justifyContent={"space-between"} mt={1}>
+                    <Typography variant="overline">{data.id+1}</Typography>
+                    <Stack direction={'row'} spacing={1} width={"full"}>
+                      <img src={data.imgSrc} alt={data.imgAlt} width={50} height={30} style={{objectFit:"cover"}}/>
+                    <Stack direction={"column"}>
+                        <Typography variant="body2">{data.songName}</Typography>
+                        <Typography variant="caption" sx={{fontSize:"0.5rem"}} width={"75%"}>{data.artistName.slice(0,20)}</Typography>
+                    </Stack>
+                    </Stack>
+                    <Typography sx={{
+                      display:"flex",
+                      justifyContent:"center",
+                      alignItems:"center"
+                    }}>3:45</Typography>
+                    <IconButton color="primary" sx={{display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        <PlayCircleOutlineIcon/>
+                    </IconButton>
+                  </Grid>
+                  ))}
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
           {/* right section */}
           {/* Player */}
-          <Grid item size={5} bgcolor={grey[500]} height={"100%"}>
-            Music Player
+          <Grid
+            item
+            size={5}
+            bgcolor={"#212028"}
+            height={"100%"}
+            padding={2}
+            borderRadius={3}
+          >
+            <Typography variant="body1">Player</Typography>
           </Grid>
         </Grid>
       </Container>
