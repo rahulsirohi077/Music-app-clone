@@ -10,13 +10,13 @@ import {
   Typography,
 } from "@mui/material";
 import NavBar from "../components/shared/NavBar";
-import { grey } from "@mui/material/colors";
+import { grey, red, yellow } from "@mui/material/colors";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CardItem from "../components/shared/CardItem";
 import { artistData } from "../data/artists";
 import { genreData } from "../data/genre";
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import { chartsData } from "../data/charts";
 
 const Home = () => {
@@ -73,11 +73,11 @@ const Home = () => {
           spacing={2}
           mt={2}
           mb={2}
-          height={"100%"}
-          // width={"100%"}
-          // sx={{
-          //   height: { xs: "40vh", sm: "45vh", md: "55vh" },
-          // }}
+          sx={{
+            // No calculations needed! Flex automatically takes remaining space
+            flex: 1,
+            minHeight: 0, // Important for flex children with overflow
+          }}
         >
           {/* left section */}
           <Grid
@@ -108,63 +108,99 @@ const Home = () => {
               paddingTop={1}
               borderRadius={3}
             >
-              <Typography variant="body1">Artist</Typography>
-              <Box
-                height={"90%"}
-                // width={"100%"}
-                display={"flex"}
-                // flexDirection={"row"}
-                justifyContent={"space-around"}
-                alignItems={"center"}
-              >
-                {artistData.map((data) => (
-                  <CardItem
-                    key={data.id}
-                    src={data.src}
-                    alt={data.alt}
-                    artistName={data.artistName}
-                    plays={data.plays}
-                  />
-                ))}
-              </Box>
+              <Stack height={"100%"} direction={"column"}>
+                <Typography variant="body1" ml={1} mt={1}>
+                  Artist
+                </Typography>
+                <Box
+                  // height={"85%"}
+                  // width={"100%"}
+                  display={"flex"}
+                  bgcolor={yellow[500]}
+                  // height={"100%"}
+                  sx={{
+                    flex: 1,
+                    minHeight: 0, // Important for flex children with overflow
+                    // height: "100%",
+
+                    // miaxHeght: "calc(100% - 32px)", // Subtract Typography height + margin
+                  }}
+                  // flexDirection={"row"}
+                  justifyContent={"space-around"}
+                  alignItems={"center"}
+                >
+                  {artistData.map((data) => (
+                    <CardItem
+                      key={data.id}
+                      src={data.src}
+                      alt={data.alt}
+                      artistName={data.artistName}
+                      plays={data.plays}
+                    />
+                  ))}
+                </Box>
+              </Stack>
             </Grid>
             {/* genre and top charts */}
             <Grid
               container
-              item
               spacing={3}
               size={12}
               direction={"row"}
-              // height={"60%"}
-              sx={{
-                flex: 1,
-                height: "60%",
-              }}
+              height={"60%"}
+              sx={
+                {
+                  // minHeight: 0, // Important for flex children with overflow
+                  // flex: 1,
+                  // maxHeight: "calc(100% - 32px)", // Subtract Typography height + margin
+                  // height: "60%",
+                }
+              }
             >
               {/* genre */}
               <Grid
-                item
+                // container
                 size={5}
                 bgcolor={"#212028"}
-                padding={2}
                 borderRadius={3}
                 height={"100%"}
+                spacing={0}
+                sx={{
+                  padding: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
               >
                 <Typography variant="body1">Genre</Typography>
-                <Grid container direction={"row"} height={"80%"} spacing={2} overflow={"auto"} mt={2}>
+                <Grid
+                  bgcolor={red[500]}
+                  container
+                  direction={"row"}
+                  spacing={1}
+                  sx={{
+                    flex: 1,
+                    overflow: "auto",
+                    mt: 0, // Remove top margin
+                  }}
+                >
                   {genreData.map((data) => (
                     <Grid
                       item
+                      size={6}
                       key={data.id}
                       bgcolor={data.bgColor}
-                      padding={1}
-                      size={6}
                       borderRadius={3}
                       display={"flex"}
-                      justifyContent={'center'}
+                      justifyContent={"center"}
                       alignItems={"center"}
+                      sx={{
+                        minHeight: "40px",
+                        mb: 1, // Small bottom margin between items
+                      }}
                     >
-                      <Typography variant={"caption"} textAlign={"center"}>{data.title}</Typography>
+                      <Typography variant={"caption"} textAlign={"center"}>
+                        {data.title}
+                      </Typography>
                     </Grid>
                   ))}
                 </Grid>
@@ -176,28 +212,70 @@ const Home = () => {
                 bgcolor={"#212028"}
                 padding={2}
                 borderRadius={3}
+                height={"100%"}
+                overflow={"auto"}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: 0, // Allows the grid to shrink below content height
+                }}
               >
                 <Typography variant="body1">Top Charts</Typography>
                 <Grid container direction={"column"}>
-                  {chartsData.map(data=>(
-                    <Grid container key={data.id} direction={"row"} width={"100%"} justifyContent={"space-between"} mt={1}>
-                    <Typography variant="overline">{data.id+1}</Typography>
-                    <Stack direction={'row'} spacing={1} width={"full"}>
-                      <img src={data.imgSrc} alt={data.imgAlt} width={50} height={30} style={{objectFit:"cover"}}/>
-                    <Stack direction={"column"}>
-                        <Typography variant="body2">{data.songName}</Typography>
-                        <Typography variant="caption" sx={{fontSize:"0.5rem"}} width={"75%"}>{data.artistName.slice(0,20)}</Typography>
-                    </Stack>
-                    </Stack>
-                    <Typography sx={{
-                      display:"flex",
-                      justifyContent:"center",
-                      alignItems:"center"
-                    }}>3:45</Typography>
-                    <IconButton color="primary" sx={{display:"flex",alignItems:"center",justifyContent:"center"}}>
-                        <PlayCircleOutlineIcon/>
-                    </IconButton>
-                  </Grid>
+                  {chartsData.map((data) => (
+                    <Grid
+                      container
+                      key={data.id}
+                      direction={"row"}
+                      width={"100%"}
+                      justifyContent={"space-between"}
+                      mt={1}
+                    >
+                      <Typography variant="overline">{data.id + 1}</Typography>
+                      <Stack direction={"row"} spacing={1} width={"full"}>
+                        <img
+                          src={data.imgSrc}
+                          alt={data.imgAlt}
+                          width={50}
+                          height={30}
+                          style={{ objectFit: "cover" }}
+                        />
+                        <Stack direction={"column"}>
+                          <Typography variant="body2">
+                            {data.songName}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontSize: "0.5rem" }}
+                            width={"75%"}
+                          >
+                            {data.artistName.slice(0, 20)}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                      <Typography
+                        width={"10%"}
+                        fontSize={"0.7rem"}
+                        variant="caption"
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        3:45
+                      </Typography>
+                      <IconButton
+                        color="primary"
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <PlayCircleOutlineIcon />
+                      </IconButton>
+                    </Grid>
                   ))}
                 </Grid>
               </Grid>
