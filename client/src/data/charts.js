@@ -1,7 +1,7 @@
 export const chartsData = [
   {
     id: 0,
-    imgSrc: "songs/havana.jpeg",
+    imgSrc: "images/havana.jpeg",
     imgAlt: "Havana Song Thumbnail",
     videoSrc: "/songs/havana.mp3",
     songName: "Havana",
@@ -10,7 +10,7 @@ export const chartsData = [
   },
   {
     id: 1,
-    imgSrc: "songs/closer.jpeg",
+    imgSrc: "images/closer.jpeg",
     imgAlt: "Closer Song Thumbnail",
     videoSrc: "/songs/closer.mp3",
     songName: "Closer",
@@ -19,7 +19,7 @@ export const chartsData = [
   },
   {
     id: 2,
-    imgSrc: "songs/lean on.jpeg",
+    imgSrc: "images/lean on.jpeg",
     imgAlt: "Lean On Song Thumbnail",
     videoSrc: "/songs/lean on.mp3",
     songName: "Lean On",

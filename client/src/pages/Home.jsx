@@ -18,6 +18,7 @@ import { artistData } from "../data/artists";
 import { genreData } from "../data/genre";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import { chartsData } from "../data/charts";
+import Player from "../components/Player";
 
 const Home = () => {
   const [liked, setLiked] = useState(false);
@@ -116,7 +117,7 @@ const Home = () => {
                   // height={"85%"}
                   // width={"100%"}
                   display={"flex"}
-                  bgcolor={yellow[500]}
+                  // bgcolor={yellow[500]}
                   // height={"100%"}
                   sx={{
                     flex: 1,
@@ -173,7 +174,7 @@ const Home = () => {
               >
                 <Typography variant="body1">Genre</Typography>
                 <Grid
-                  bgcolor={red[500]}
+                  // bgcolor={red[500]}
                   container
                   direction={"row"}
                   spacing={1}
@@ -232,7 +233,7 @@ const Home = () => {
                       mt={1}
                     >
                       <Typography variant="overline">{data.id + 1}</Typography>
-                      <Stack direction={"row"} spacing={1} width={"full"}>
+                      <Stack direction={"row"} spacing={2} width={"full"}>
                         <img
                           src={data.imgSrc}
                           alt={data.imgAlt}
@@ -247,9 +248,9 @@ const Home = () => {
                           <Typography
                             variant="caption"
                             sx={{ fontSize: "0.5rem" }}
-                            width={"75%"}
+                            width={"100%"}
                           >
-                            {data.artistName.slice(0, 20)}
+                            {data.artistName.slice(0, 16)}
                           </Typography>
                         </Stack>
                       </Stack>
@@ -288,10 +289,13 @@ const Home = () => {
             size={5}
             bgcolor={"#212028"}
             height={"100%"}
-            padding={2}
+            // padding={2}
             borderRadius={3}
           >
-            <Typography variant="body1">Player</Typography>
+            <Stack height={"100%"}>
+              <Typography variant="body1" paddingLeft={2} paddingTop={2}>Player</Typography>
+              <Player/>
+            </Stack>
           </Grid>
         </Grid>
       </Container>

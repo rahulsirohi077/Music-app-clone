@@ -3,14 +3,36 @@ import {
   AppBar,
   Avatar,
   Box,
+  Button,
+  Divider,
   InputAdornment,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
   TextField,
   Toolbar,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { grey } from "@mui/material/colors";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (e) => {
+    console.log(e.target)
+    setAnchorEl(null);
+  };
+
   return (
     <Box py={"1rem"}>
       <AppBar
@@ -24,6 +46,7 @@ const NavBar = () => {
             Music
           </Typography>
           <TextField
+            aria-label="Search Song"
             size="small"
             placeholder="Type Here to Search"
             sx={{
@@ -62,7 +85,44 @@ const NavBar = () => {
             variant="outlined"
           />
           <Box flexGrow={1}></Box>
-          <Avatar>A</Avatar>
+          <Button
+            sx={{
+              cursor: "pointer",
+              ":hover": {
+                bgcolor: grey[500],
+                transition: "0.4s ease-in-out",
+              },
+              ":focus": {
+                bgcolor: grey[500],
+                transition: "0.4s ease-in-out",
+                outline: "none",
+              },
+            }}
+            padding={1}
+            aria-label="User Avatar"
+            aria-controls={open ? "menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+          >
+            <Avatar>A</Avatar>
+            <ArrowDropDownIcon sx={{color:"white"}}/>
+          </Button>
+          <Menu
+            id="menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            slotProps={{
+              list: {
+                "aria-label": "Avatar DropDown Menu",
+              },
+            }}
+          >
+            <MenuItem onClick={()=>navigate('/settings')} autoFocus><ListItemText>Settings</ListItemText></MenuItem>
+            <Divider/>
+            <MenuItem onClick={handleClose}><ListItemText>Logout</ListItemText></MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
     </Box>
