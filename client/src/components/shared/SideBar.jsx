@@ -7,7 +7,7 @@ import AlbumIcon from '@mui/icons-material/Album';
 const SideBar = () => {
   return (
     <Box
-      width={{ xs: "100vw", sm: "100%" }}
+      width={{ xs: "100%", sm: "100%" }}
       minHeight="100vh"
       sx={{
         bgcolor: "#18171c",

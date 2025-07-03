@@ -1,116 +1,250 @@
-import React, { useContext, useState } from 'react'
-import { Button, Container, IconButton, InputLabel, Link, Paper, TextField, Typography } from "@mui/material"
-import { useNavigate } from 'react-router-dom'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { login } from '../apis/userAPI'
-import { useForm } from 'react-hook-form'
-import { UserContext } from '../context/UserContext'
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Avatar,
+  Button,
+  Container,
+  IconButton,
+  InputLabel,
+  Paper,
+  Stack,
+  styled,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { CameraAlt, Visibility, VisibilityOff } from "@mui/icons-material";
+import { signUp } from "../apis/userAPI";
+import { useForm } from "react-hook-form";
+import { UserContext } from "../context/UserContext";
+import AppLayout from "../components/layout/AppLayout";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const Settings = () => {
-    const {setUser} = useContext(UserContext);
-    const navigate = useNavigate();
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting},
-      } = useForm();
+//   const { setUser } = useContext(UserContext);
+//   const navigate = useNavigate();
 
-    const [showPassword, setShowPassword] = useState(false);
-    
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-    const handleLogin = async(data) => {
-        console.log("data=> ",data)
-        await login(data,navigate,setUser)
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
     }
+  };
 
-    return (
-        <div>
-            <Container
-                component={"main"}
-                maxWidth={"xs"}
-                sx={{
-                    height: "100vh",
-                    display: 'flex',
-                    justifyContent: "center",
-                    alignItems: 'center',
-                }}
+  useEffect(() => {
+    return () => {
+      if (selectedImage) {
+        URL.revokeObjectURL(selectedImage);
+      }
+    };
+  }, [selectedImage]);
+
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm();
+
+  const handleModification = async (data) => {
+    console.log(data);
+  };
+
+  return (
+    <div>
+      <Container
+        component={"main"}
+        maxWidth={"xs"}
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+            padding: 3,
+            height: "80%",
+            overflow: "auto",
+          }}
+        >
+          <Typography variant="h5">Modify Information</Typography>
+          <form
+            style={{
+              marginTop: "1rem",
+              width: "100%",
+            }}
+            onSubmit={handleSubmit(handleModification)}
+          >
+            {/* Profile Pic */}
+            <Stack
+              width={"100%"}
+              direction={"column"}
+              spacing={2}
+              justifyContent={"center"}
+              alignItems={"center"}
+              marginBottom={2}
             >
-                <Paper
-                    elevation={3}
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        padding: 4
-                    }}
-                >
-                    <Typography variant='h5'>Modify Your Information</Typography>
-                    <form
-                        style={{
-                            marginTop: "1rem",
-                            width: "100%",
-                        }}
-                        onSubmit={handleSubmit(handleLogin)}
-                    >
-                        <InputLabel htmlFor="username" >Username or Email</InputLabel>
-                        <TextField
-                            id='username'
-                            margin='normal'
-                            fullWidth
-                            {...register('userNameOrEmail',{required:"UserName Or Email is required"})}
-                            variant='outlined'
-                            error={!!errors.userNameOrEmail}
-                            helperText={errors?.userNameOrEmail?.message}
-                            aria-invalid={!!errors.userNameOrEmail}
-                        />
-                        <InputLabel htmlFor="password">Password</InputLabel>
-                        <TextField
-                            id='password'
-                            margin='normal'
-                            fullWidth
-                            variant='outlined'
-                            type={showPassword ? "text" : "password"}
-                            {...register('password',{required:"Password is Required"})}
-                            error={errors?.password}
-                            helperText={errors?.password?.message}
-                            aria-invalid={!!errors.password}
-                            slotProps={{
-                                input: {
-                                    endAdornment: <IconButton 
-                                    aria-label={showPassword?"Hide Password":"Show Password"}
-                                    onClick={() => setShowPassword((prev) => !prev)}>
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                }
-                            }}
-                        />
-                        <Button
-                            variant='contained'
-                            sx={{
-                                marginTop: "1rem"
-                            }}
-                            fullWidth
-                            type='submit'
-                            disabled={isSubmitting}
-                            aria-disabled={isSubmitting}
-                        >
-                            Login
-                        </Button>
-                        <Typography textAlign={"center"} m={"1rem"}>
-                            Or
-                        </Typography>
-                        <Button 
-                            fullWidth
-                            variant='outlined'
-                            href='/signup'
-                        >
-                            Sign Up Instead
-                        </Button>
-                    </form>
-                </Paper>
-            </Container>
-        </div>
-    )
-}
+              <Avatar
+                alt="Uploaded Preview"
+                src={selectedImage}
+                sx={{
+                  width: "8rem",
+                  height: "8rem",
+                  objectFit: "contain",
+                }}
+              />
 
-export default Settings
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUploadIcon />}
+                sx={{
+                  height: "auto",
+                  minHeight: 0,
+                  width: "auto",
+                  minWidth: 0,
+                  paddingY: 1,
+                  alignSelf: "center", // prevents stretching in flex row
+                  flex: "0 0 auto", // do not grow or shrink
+                }}
+              >
+                Upload Profile Pic
+                <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+              </Button>
+            </Stack>
+            {/* username field */}
+            <InputLabel htmlFor="username">New Username</InputLabel>
+            <TextField
+              id="username"
+              margin="dense"
+              fullWidth
+              variant="outlined"
+              {...register("username", {
+                required: "UserName is required",
+                validate: (value) =>
+                  value.length >= 10 && value.length <= 20
+                    ? true
+                    : "Username should be between 10 and 20 characters",
+              })}
+              helperText={errors.username?.message}
+              error={!!errors.username}
+              aria-invalid={!!errors.username}
+            />
+
+            {/* password field */}
+            <InputLabel htmlFor="password">New Password</InputLabel>
+            <TextField
+              id="password"
+              margin="dense"
+              fullWidth
+              variant="outlined"
+              type={showPassword ? "text" : "password"}
+              {...register("password", {
+                required: "Password is required",
+                pattern: {
+                  value:
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,15}$/,
+                  message:
+                    "Password must be between 8 and 15 characters and include uppercase, lowercase, number, and special character",
+                },
+              })}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <IconButton
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  ),
+                },
+              }}
+              helperText={errors.password?.message}
+              error={!!errors.password}
+              aria-invalid={!!errors.password}
+            />
+
+            {/* confirm password field */}
+            <InputLabel htmlFor="confirmPassword">
+              Confirm New Password
+            </InputLabel>
+            <TextField
+              id="confirmPassword"
+              margin="dense"
+              fullWidth
+              variant="outlined"
+              type={showConfirmPassword ? "text" : "password"}
+              {...register("confirmPassword", {
+                required: "Confirm Password is required",
+                validate: (value) =>
+                  value === getValues("password") || "Passwords do not match",
+              })}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <IconButton
+                      aria-label={
+                        showConfirmPassword
+                          ? "Hide confirm password"
+                          : "Show confirm password"
+                      }
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  ),
+                },
+              }}
+              helperText={errors.confirmPassword?.message}
+              error={!!errors.confirmPassword}
+              aria-invalid={!!errors.confirmPassword}
+            />
+
+            {/* Buttons */}
+            <Button
+              variant="contained"
+              sx={{
+                marginTop: "0.5rem",
+              }}
+              fullWidth
+              type="submit"
+            >
+              Confirm Changes
+            </Button>
+          </form>
+        </Paper>
+      </Container>
+    </div>
+  );
+};
+
+const WrappedSettings = AppLayout(Settings);
+export default WrappedSettings;
