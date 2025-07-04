@@ -16,7 +16,7 @@ const mongoUri = process.env.MONGO_URL;
 
 connectDB(mongoUri)
 
-
+app.use('/uploads',express.static("public/data/uploads"))
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({

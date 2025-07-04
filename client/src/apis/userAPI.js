@@ -76,4 +76,16 @@ const getUser = async (setUser,toastId) => {
   }
 };
 
-export { signUp, login, getUser };
+const updateInfo = async(formData) => {
+  const toastId = toast.loading("Loading...")
+  try {
+    const response = await apiconnector("POST",userEndpoints.UPDATE_INFO_API,formData);
+    console.log(response);
+    toast.success(response?.data?.message,{id:toastId});
+  } catch (error) {
+    console.log(error);
+    toast.error(error?.data?.message || error.message,{id:toastId});
+  }
+}
+
+export { signUp, login, getUser, updateInfo };

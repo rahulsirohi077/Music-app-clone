@@ -1,6 +1,8 @@
 import { compare } from "bcrypt";
 import { User } from "../models/user.js";
 import jwt from "jsonwebtoken";
+import fs from 'fs';
+import path from 'path';
 
 const cookieOptions = {
   httpOnly: true,
@@ -234,4 +236,59 @@ const refreshTokens = async (req, res) => {
   }
 };
 
-export { login, signUp, refreshTokens, getUser };
+const updateInfo = async (req, res) => {
+  try {
+    const profilePic = req.file;
+    const { username, password } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (username) {
+      user.username = username;
+    }
+
+    if (password) {
+      user.password = password;
+    }
+
+    await user.save();
+    console.log("Profile Pic = "+profilePic);
+
+    let fileUrl = null;
+
+    if (profilePic) {
+      const ext = path.extname(profilePic.originalname);
+      const newFileName = username + ext;
+      const newPath = path.join(profilePic.destination, newFileName);
+
+      // Rename the uploaded file
+      fs.renameSync(profilePic.path, newPath);
+
+      fileUrl = `/uploads/${newFileName}`;
+    }
+
+    return res.status(200).json({
+      success:true,
+      message:'Information Updated Successfully',
+      profilePicUrl:fileUrl || null
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:error.message
+    })
+  }
+};
+
+const Logout = async (req, res) => {
+  return res
+    .status(200)
+    .cookie("accessToken", "", { ...cookieOptions, maxAge: 0 })
+    .cookie("refreshToken", "", { ...cookieOptions, maxAge: 0 })
+    .json({
+      success: true,
+      message: "Logged Out Successfully",
+    });
+};
+
+export { login, signUp, refreshTokens, getUser, updateInfo, Logout };

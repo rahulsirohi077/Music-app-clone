@@ -13,11 +13,13 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { CameraAlt, Visibility, VisibilityOff } from "@mui/icons-material";
-import { signUp } from "../apis/userAPI";
+import { signUp, updateInfo } from "../apis/userAPI";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../context/UserContext";
 import AppLayout from "../components/layout/AppLayout";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { grey } from "@mui/material/colors";
+import axios from "axios";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -32,8 +34,8 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const Settings = () => {
-//   const { setUser } = useContext(UserContext);
-//   const navigate = useNavigate();
+  //   const { setUser } = useContext(UserContext);
+  //   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -63,7 +65,16 @@ const Settings = () => {
   } = useForm();
 
   const handleModification = async (data) => {
-    console.log(data);
+    const formData = new FormData();
+
+    const file = data.file[0];
+    formData.append("profilePic", file);
+    formData.append("username", data.username);
+    formData.append("password", data.password);
+    // for( let [key,value] of formData.entries()){
+    //   console.log(key+" : "+value);
+    // }
+    await updateInfo(formData);
   };
 
   return (
@@ -86,8 +97,10 @@ const Settings = () => {
             alignItems: "center",
             gap: 2,
             padding: 3,
-            height: "80%",
+            height: "90%",
             overflow: "auto",
+            backgroundColor: grey[800],
+            color: "#ececee",
           }}
         >
           <Typography variant="h5">Modify Information</Typography>
@@ -95,7 +108,10 @@ const Settings = () => {
             style={{
               marginTop: "1rem",
               width: "100%",
+              color: "#ececee",
+              gap: 1,
             }}
+            enctype="multipart/form-data"
             onSubmit={handleSubmit(handleModification)}
           >
             {/* Profile Pic */}
@@ -134,11 +150,17 @@ const Settings = () => {
                 }}
               >
                 Upload Profile Pic
-                <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+                <VisuallyHiddenInput
+                  type="file"
+                  {...register("file")}
+                  onChange={handleFileChange}
+                />
               </Button>
             </Stack>
             {/* username field */}
-            <InputLabel htmlFor="username">New Username</InputLabel>
+            <InputLabel htmlFor="username" sx={{ color: "#ececee" }}>
+              New Username
+            </InputLabel>
             <TextField
               id="username"
               margin="dense"
@@ -154,10 +176,32 @@ const Settings = () => {
               helperText={errors.username?.message}
               error={!!errors.username}
               aria-invalid={!!errors.username}
+              sx={{
+                input: {
+                  color: "#d3d3d3",
+                  backgroundColor: "#1d1d1d",
+                  borderRadius: "1rem",
+                },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: ".5rem",
+                  backgroundColor: "#1d1d1d",
+                  "& fieldset": {
+                    border: "1.5px solid #d3d3d3",
+                  },
+                  "&:hover fieldset": {
+                    border: "1.5px solid #1976d2",
+                  },
+                  "&.Mui-focused fieldset": {
+                    border: "1.5px solid #1976d2",
+                  },
+                },
+              }}
             />
 
             {/* password field */}
-            <InputLabel htmlFor="password">New Password</InputLabel>
+            <InputLabel htmlFor="password" sx={{ color: "#ececee" }}>
+              New Password
+            </InputLabel>
             <TextField
               id="password"
               margin="dense"
@@ -180,6 +224,7 @@ const Settings = () => {
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
+                      sx={{ color: "#ececee" }}
                       onClick={() => setShowPassword((prev) => !prev)}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -190,10 +235,30 @@ const Settings = () => {
               helperText={errors.password?.message}
               error={!!errors.password}
               aria-invalid={!!errors.password}
+              sx={{
+                input: {
+                  color: "#d3d3d3",
+                  backgroundColor: "#1d1d1d",
+                  borderRadius: "1rem",
+                },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: ".5rem",
+                  backgroundColor: "#1d1d1d",
+                  "& fieldset": {
+                    border: "1.5px solid #d3d3d3",
+                  },
+                  "&:hover fieldset": {
+                    border: "1.5px solid #1976d2",
+                  },
+                  "&.Mui-focused fieldset": {
+                    border: "1.5px solid #1976d2",
+                  },
+                },
+              }}
             />
 
             {/* confirm password field */}
-            <InputLabel htmlFor="confirmPassword">
+            <InputLabel htmlFor="confirmPassword" sx={{ color: "#ececee" }}>
               Confirm New Password
             </InputLabel>
             <TextField
@@ -216,6 +281,7 @@ const Settings = () => {
                           ? "Hide confirm password"
                           : "Show confirm password"
                       }
+                      sx={{ color: "#ececee" }}
                       onClick={() => setShowConfirmPassword((prev) => !prev)}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
@@ -226,6 +292,26 @@ const Settings = () => {
               helperText={errors.confirmPassword?.message}
               error={!!errors.confirmPassword}
               aria-invalid={!!errors.confirmPassword}
+              sx={{
+                input: {
+                  color: "#d3d3d3",
+                  backgroundColor: "#1d1d1d",
+                  borderRadius: "1rem",
+                },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: ".5rem",
+                  backgroundColor: "#1d1d1d",
+                  "& fieldset": {
+                    border: "1.5px solid #d3d3d3",
+                  },
+                  "&:hover fieldset": {
+                    border: "1.5px solid #1976d2",
+                  },
+                  "&.Mui-focused fieldset": {
+                    border: "1.5px solid #1976d2",
+                  },
+                },
+              }}
             />
 
             {/* Buttons */}
