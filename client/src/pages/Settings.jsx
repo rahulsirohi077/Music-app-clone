@@ -19,7 +19,6 @@ import { UserContext } from "../context/UserContext";
 import AppLayout from "../components/layout/AppLayout";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { grey } from "@mui/material/colors";
-import axios from "axios";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -164,10 +163,11 @@ const Settings = () => {
             <TextField
               id="username"
               margin="dense"
+              type="text"
               fullWidth
               variant="outlined"
               {...register("username", {
-                required: "UserName is required",
+                // required: "UserName is required",
                 validate: (value) =>
                   value.length >= 10 && value.length <= 20
                     ? true
@@ -209,7 +209,7 @@ const Settings = () => {
               variant="outlined"
               type={showPassword ? "text" : "password"}
               {...register("password", {
-                required: "Password is required",
+                // required: "Password is required",
                 pattern: {
                   value:
                     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,15}$/,
@@ -268,7 +268,7 @@ const Settings = () => {
               variant="outlined"
               type={showConfirmPassword ? "text" : "password"}
               {...register("confirmPassword", {
-                required: "Confirm Password is required",
+                // required: "Confirm Password is required",
                 validate: (value) =>
                   value === getValues("password") || "Passwords do not match",
               })}

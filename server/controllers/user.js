@@ -65,6 +65,7 @@ const login = async (req, res) => {
       .json({
         success: true,
         message: "User Logged In Successfully",
+        user
       });
   } catch (error) {
     return res.status(401).json({
@@ -135,6 +136,7 @@ const signUp = async (req, res) => {
       .json({
         success: true,
         message: "User Sign In Successfully",
+        user
       });
   } catch (error) {
     console.log(error);
@@ -257,7 +259,7 @@ const updateInfo = async (req, res) => {
 
     if (profilePic) {
       const ext = path.extname(profilePic.originalname);
-      const newFileName = username + ext;
+      const newFileName = user.username + ext;
       const newPath = path.join(profilePic.destination, newFileName);
 
       // Rename the uploaded file

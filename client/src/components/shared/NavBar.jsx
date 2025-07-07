@@ -102,7 +102,7 @@ const NavBar = () => {
             aria-label="User Avatar"
             aria-controls={open ? "menu" : undefined}
             aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
+            aria-expanded={open ? "true" : "false"}
             onClick={handleClick}
           >
             <Avatar>A</Avatar>

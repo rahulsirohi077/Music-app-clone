@@ -70,6 +70,7 @@ const SignUp = () => {
               id="username"
               margin="dense"
               fullWidth
+              type="text"
               variant="outlined"
               {...register("username", {
                 required: "UserName is required",

@@ -56,6 +56,7 @@ const Login = () => {
                         <TextField
                             id='username'
                             margin='normal'
+                            type='text'
                             fullWidth
                             {...register('userNameOrEmail',{required:"UserName Or Email is required"})}
                             variant='outlined'

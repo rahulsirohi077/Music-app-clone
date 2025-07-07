@@ -10,7 +10,7 @@ import { auth } from "../middlewares/auth.js";
 import multer from "multer";
 
 const app = express.Router();
-const upload = multer({ dest: "./public/data/uploads/" });
+const upload = multer({ dest: "./public/data/uploads/profilePics" });
 
 app.post("/login", login);
 app.post("/signup", signUp);
