@@ -3,7 +3,8 @@ import dotenv from 'dotenv'
 import { connectDB } from './config/Db.js';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
-import userRoutes from './routes/user.js'
+import userRoutes from './routes/user.js';
+import trackRoutes from './routes/track.js';
 
 const app = express();
 const PORT = 3000;
@@ -26,6 +27,7 @@ app.use(cors({
 }))
 
 app.use("/api/v1/user", userRoutes)
+app.use("/api/v1/track", trackRoutes)
 
 app.get("/",(req,res)=>{
     res.send('hello world');

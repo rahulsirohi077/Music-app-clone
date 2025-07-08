@@ -22,7 +22,7 @@ const signUp = async (
       toast.success("SignUp Successful", { id: toastId });
       setTimeout(() => {
         navigate("/");
-        setUser(true);
+        setUser(response.data.user);
       }, 5000);
     } else {
       toast.error(response?.data?.message || "Something Went Wrong", {
@@ -52,7 +52,7 @@ const login = async ({ userNameOrEmail, password }, navigate, setUser) => {
       toast.success("Login Successful", { id: toastId });
       setTimeout(() => {
         navigate("/");
-        setUser(true);
+        setUser(response.data.user);
       }, 5000);
     } else {
       toast.error(response.data.message, { id: toastId });
