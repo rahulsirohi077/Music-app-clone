@@ -1,4 +1,4 @@
-import { Track } from "../models/track";
+import { Track } from "../models/track.js";
 
 const fetchMusicList = async (req, res) => {
   try {

@@ -8,3 +8,9 @@ export const userEndpoints = {
     REFRESH_TOKENS_API: BASE_URL+ "/user/refresh",
     UPDATE_INFO_API: BASE_URL+"/user/update-info"
 }
+
+// Track Endpoints
+export const trackEndpoints = {
+    FETCH_MUSIC_LIST_API: BASE_URL + "/track/fetch-music-list",
+    SEARCH_API: BASE_URL + "/track/search"
+}

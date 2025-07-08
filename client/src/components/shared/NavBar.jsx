@@ -1,4 +1,5 @@
 import { Search } from "@mui/icons-material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
   AppBar,
   Avatar,
@@ -9,27 +10,38 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Stack,
   TextField,
   Toolbar,
-  Typography,
+  Typography
 } from "@mui/material";
-import React, { useState } from "react";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { grey } from "@mui/material/colors";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { searchTrack } from "../../apis/trackAPI";
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
+  const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      if (searchText.trim()) {
+        searchTrack(searchText)
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeOutId);
+  }, [searchText]);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (e) => {
-    console.log(e.target)
+  const handleClose = () => {
+    // console.log(e.target);
     setAnchorEl(null);
   };
 
@@ -46,8 +58,11 @@ const NavBar = () => {
             Music
           </Typography>
           <TextField
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             aria-label="Search Song"
             size="small"
+            type="text"
             placeholder="Type Here to Search"
             sx={{
               input: {
@@ -106,7 +121,7 @@ const NavBar = () => {
             onClick={handleClick}
           >
             <Avatar>A</Avatar>
-            <ArrowDropDownIcon sx={{color:"white"}}/>
+            <ArrowDropDownIcon sx={{ color: "white" }} />
           </Button>
           <Menu
             id="menu"
@@ -119,9 +134,13 @@ const NavBar = () => {
               },
             }}
           >
-            <MenuItem onClick={()=>navigate('/settings')} autoFocus><ListItemText>Settings</ListItemText></MenuItem>
-            <Divider/>
-            <MenuItem onClick={handleClose}><ListItemText>Logout</ListItemText></MenuItem>
+            <MenuItem onClick={() => navigate("/settings")} autoFocus>
+              <ListItemText>Settings</ListItemText>
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleClose}>
+              <ListItemText>Logout</ListItemText>
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>

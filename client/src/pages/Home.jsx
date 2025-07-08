@@ -17,11 +17,23 @@ import CardItem from "../components/shared/CardItem";
 import { artistData } from "../data/artists";
 import { genreData } from "../data/genre";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import { chartsData } from "../data/charts";
+// import { chartsData } from "../data/charts";
 import Player from "../components/Player";
+import { useEffect } from "react";
+import { fetchMusicList } from "../apis/trackAPI";
+const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const Home = () => {
   const [liked, setLiked] = useState(false);
+  const [chartsData, setChartsData] = useState([]);
+
+  useEffect(() => {
+    const fetchMusic = async () => {
+      const response = await fetchMusicList();
+      setChartsData(response?.musicList || []);
+    };
+    fetchMusic();
+  }, []);
 
   return (
     <Stack sx={{ height: "100vh" }}>
@@ -223,59 +235,69 @@ const Home = () => {
               >
                 <Typography variant="body1">Top Charts</Typography>
                 <Grid container direction={"column"}>
-                  {chartsData.map((data) => (
+                  {chartsData.map((data, index) => (
                     <Grid
                       container
-                      key={data.id}
+                      key={index + 1}
                       direction={"row"}
                       width={"100%"}
                       justifyContent={"space-between"}
                       mt={1}
                     >
-                      <Typography variant="overline">{data.id + 1}</Typography>
-                      <Stack direction={"row"} spacing={2} width={"full"}>
-                        <img
-                          src={data.imgSrc}
-                          alt={data.imgAlt}
-                          width={50}
-                          height={30}
-                          style={{ objectFit: "cover" }}
-                        />
-                        <Stack direction={"column"}>
-                          <Typography variant="body2">
-                            {data.songName}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ fontSize: "0.5rem" }}
-                            width={"100%"}
-                          >
-                            {data.artistName.slice(0, 16)}
-                          </Typography>
+                      <Grid size={1}>
+                        <Typography variant="overline">{index + 1}</Typography>
+                      </Grid>
+                      <Grid size={6}>
+                        <Stack direction={"row"} spacing={2} width={"full"}>
+                          <img
+                            src={STATIC_URL + data.thumbnailUrl}
+                            alt={`${data.title} Thumbnail`}
+                            width={50}
+                            height={30}
+                            style={{ objectFit: "cover" }}
+                          />
+                          <Stack direction={"column"}>
+                            <Typography variant="body2">
+                              {data.title}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontSize: "0.5rem" }}
+                              width={"100%"}
+                            >
+                              {data?.artist && data?.artist.slice(0, 16)}
+                            </Typography>
+                          </Stack>
                         </Stack>
-                      </Stack>
-                      <Typography
-                        width={"10%"}
-                        fontSize={"0.7rem"}
-                        variant="caption"
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        3:45
-                      </Typography>
-                      <IconButton
-                        color="primary"
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <PlayCircleOutlineIcon />
-                      </IconButton>
+                      </Grid>
+                      <Grid size={2}>
+                        <Typography
+                          width={"100%"}
+                          height={"100%"}
+                          fontSize={"0.7rem"}
+                          variant="caption"
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          {data.duration}
+                        </Typography>
+                      </Grid>
+
+                      <Grid size={2}>
+                        <IconButton
+                          color="primary"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <PlayCircleOutlineIcon />
+                        </IconButton>
+                      </Grid>
                     </Grid>
                   ))}
                 </Grid>
@@ -293,8 +315,10 @@ const Home = () => {
             borderRadius={3}
           >
             <Stack height={"100%"}>
-              <Typography variant="body1" paddingLeft={2} paddingTop={2}>Player</Typography>
-              <Player/>
+              <Typography variant="body1" paddingLeft={2} paddingTop={2}>
+                Player
+              </Typography>
+              <Player />
             </Stack>
           </Grid>
         </Grid>
