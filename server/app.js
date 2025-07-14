@@ -5,6 +5,9 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.js';
 import trackRoutes from './routes/track.js';
+import path from 'path';
+
+global.appRoot = path.resolve();
 
 const app = express();
 const PORT = 3000;

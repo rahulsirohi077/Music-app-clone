@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
   Avatar,
   Button,
@@ -11,14 +12,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { CameraAlt, Visibility, VisibilityOff } from "@mui/icons-material";
-import { signUp, updateInfo } from "../apis/userAPI";
-import { useForm } from "react-hook-form";
-import { UserContext } from "../context/UserContext";
-import AppLayout from "../components/layout/AppLayout";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { grey } from "@mui/material/colors";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { updateInfo } from "../apis/userAPI";
+import AppLayout from "../components/layout/AppLayout";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -110,7 +108,7 @@ const Settings = () => {
               color: "#ececee",
               gap: 1,
             }}
-            enctype="multipart/form-data"
+            encType="multipart/form-data"
             onSubmit={handleSubmit(handleModification)}
           >
             {/* Profile Pic */}

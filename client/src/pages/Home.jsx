@@ -35,6 +35,12 @@ const Home = () => {
     fetchMusic();
   }, []);
 
+  function formatDuration(value) {
+    const minute = Math.floor(value / 60);
+    const secondLeft = value - minute * 60;
+    return `${minute}:${secondLeft < 10 ? `0${secondLeft}` : secondLeft}`;
+  }
+
   return (
     <Stack sx={{ height: "100vh" }}>
       <NavBar />
@@ -282,7 +288,7 @@ const Home = () => {
                             alignItems: "center",
                           }}
                         >
-                          {data.duration}
+                          {formatDuration(data.duration)}
                         </Typography>
                       </Grid>
 
