@@ -72,6 +72,11 @@ const Home = () => {
                     sx={{
                       border: "1px solid white",
                       borderRadius: 10,
+                      "&:focus-visible": {
+                        border: "2px solid",
+                        borderColor: "primary.main", // uses theme's primary color
+                        outline: "none",
+                      },
                     }}
                     onClick={() => setLiked((prev) => !prev)}
                   >
@@ -126,6 +131,7 @@ const Home = () => {
               paddingX={2}
               paddingTop={1}
               borderRadius={3}
+              tabIndex={0}
             >
               <Stack height={"100%"} direction={"column"}>
                 <Typography variant="body1" ml={1} mt={1}>
@@ -147,9 +153,12 @@ const Home = () => {
                   // flexDirection={"row"}
                   justifyContent={"space-around"}
                   alignItems={"center"}
+                  tabIndex={0}
+                  aria-activedescendant="card-0"
                 >
-                  {artistData.map((data) => (
+                  {artistData.map((data, ind) => (
                     <CardItem
+                      id={`card-${ind}`}
                       key={data.id}
                       src={data.src}
                       alt={data.alt}
@@ -189,8 +198,12 @@ const Home = () => {
                   display: "flex",
                   flexDirection: "column",
                 }}
+                tabIndex={0}
+                aria-labelledby="genre"
               >
-                <Typography variant="body1">Genre</Typography>
+                <Typography variant="body1" id="genre">
+                  Genre
+                </Typography>
                 <Grid
                   // bgcolor={red[500]}
                   container
@@ -216,6 +229,7 @@ const Home = () => {
                         minHeight: "40px",
                         mb: 1, // Small bottom margin between items
                       }}
+                      tabIndex={0}
                     >
                       <Typography variant={"caption"} textAlign={"center"}>
                         {data.title}
@@ -237,9 +251,20 @@ const Home = () => {
                   display: "flex",
                   flexDirection: "column",
                   minHeight: 0, // Allows the grid to shrink below content height
+                  /* Hide scrollbar for Chrome, Safari and Opera */
+                  "&::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                  /* Hide scrollbar for IE, Edge and Firefox */
+                  scrollbarWidth: "none", // Firefox
+                  msOverflowStyle: "none", // IE and Edge
                 }}
+                tabIndex={0}
+                aria-labelledby="top-charts"
               >
-                <Typography variant="body1">Top Charts</Typography>
+                <Typography variant="body1" id="top-charts">
+                  Top Charts
+                </Typography>
                 <Grid container direction={"column"}>
                   {chartsData.map((data, index) => (
                     <Grid
@@ -292,7 +317,14 @@ const Home = () => {
                         </Typography>
                       </Grid>
 
-                      <Grid size={2}>
+                      <Grid
+                        size={2}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
                         <IconButton
                           color="primary"
                           sx={{
@@ -300,6 +332,13 @@ const Home = () => {
                             alignItems: "center",
                             justifyContent: "center",
                           }}
+                          aria-label={`Play ${data.title} by ${
+                            data.artist
+                          }, duration of the song is ${
+                            formatDuration(data.duration).split(":")[0]
+                          } minutes and ${
+                            formatDuration(data.duration).split(":")[1]
+                          } seconds`}
                         >
                           <PlayCircleOutlineIcon />
                         </IconButton>
@@ -319,9 +358,16 @@ const Home = () => {
             height={"100%"}
             // padding={2}
             borderRadius={3}
+            tabIndex={0}
+            aria-labelledby="player-heading"
           >
             <Stack height={"100%"}>
-              <Typography variant="body1" paddingLeft={2} paddingTop={2}>
+              <Typography
+                variant="body1"
+                paddingLeft={2}
+                paddingTop={2}
+                id="player-heading"
+              >
                 Player
               </Typography>
               <Player />

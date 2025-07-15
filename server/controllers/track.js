@@ -31,21 +31,40 @@ const searchTrack = async (req, res) => {
       });
     }
 
-    const track = await Track.find({
-      title: { $regex: trackTitle, $options: "i" },
+    let totalTracks = trackTitle.trim().split(" ").map((word) => {
+      return Track.find({
+        // title: { $regex: word, $options: "i" },
+        title: { $regex: `\\b${word}\\b`, $options: "i" },
+      });
     });
 
-    if (!track) {
+    let results = await Promise.all(totalTracks);
+
+    results = results.flat();
+
+    const uniqueTracksMap = new Map();
+    results.forEach((track) => {
+      uniqueTracksMap.set(track._id.toString(), track);
+    });
+    const uniqueTracks = Array.from(uniqueTracksMap.values());
+
+    // totalTracks.push(
+    //   await Track.find({
+    //     title: { $regex: trackTitle, $options: "i" },
+    //   })
+    // );
+
+    if (uniqueTracks.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Track Does Not Exist",
+        message: "No Track Found",
       });
     }
 
     return res.status(200).json({
       success: true,
       message: "Track Fetched Successfully",
-      track,
+      tracks: uniqueTracks,
     });
   } catch (error) {
     // console.log(error);

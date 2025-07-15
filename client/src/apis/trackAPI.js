@@ -29,7 +29,7 @@ const searchTrack = async (trackTitle) => {
     return response.data;
   } catch (error) {
     console.log(error);
-    toast.error(error?.data?.message || error.message, { id: toastId });
+    toast.error(error?.response?.data?.message || error.message, { id: toastId });
   }
 };
 

@@ -6,35 +6,87 @@ import {
   Box,
   Button,
   Divider,
+  Fade,
   InputAdornment,
+  Link,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
+  Paper,
+  Popper,
   TextField,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { searchTrack } from "../../apis/trackAPI";
+const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const [searchData, setSearchData] = useState([]);
+  const searchDataRef = useRef();
+  const openMenu = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
 
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    const timeOutId = setTimeout(() => {
+    setHighlightedIndex(0);
+  }, [searchData]);
+
+  useEffect(() => {
+    const timeOutId = setTimeout(async () => {
+      if (!searchText.trim()) setOpen(false);
       if (searchText.trim()) {
-        searchTrack(searchText)
+        const data = await searchTrack(searchText);
+        if (data) {
+          setSearchData(data.tracks);
+          setOpen(true);
+        }
+        else{
+          setOpen(false);
+        }
       }
     }, 1000);
 
     return () => clearTimeout(timeOutId);
   }, [searchText]);
+
+  const handleKeyDown = (e) => {
+    if (!open || !searchData.length) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev < searchData.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev > 0 ? prev - 1 : searchData.length - 1
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      // Handle selection (e.g., navigate or fill input)
+      const selected = searchData[highlightedIndex];
+      if (selected) {
+        setSearchText(selected.title);
+        setOpen(false);
+        // Optionally, trigger navigation or other action here
+      }
+    } else if (e.key === "Escape" || e.key === "Tab") {
+      setOpen(false);
+    }
+  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -58,9 +110,22 @@ const NavBar = () => {
             Music
           </Typography>
           <TextField
+            ref={searchDataRef}
             value={searchText}
+            onBlur={() => setOpen(false)}
+            onKeyDown={handleKeyDown}
             onChange={(e) => setSearchText(e.target.value)}
+            onFocus={()=>{
+              if(searchData?.length>0) setOpen(true)
+            }}
             aria-label="Search Song"
+            aria-controls="search-dropdown-listbox"
+            aria-expanded={open}
+            aria-activedescendant={
+              open && searchData.length > 0
+                ? `search-option-${highlightedIndex}`
+                : undefined
+            }
             size="small"
             type="text"
             placeholder="Type Here to Search"
@@ -123,10 +188,11 @@ const NavBar = () => {
             <Avatar>A</Avatar>
             <ArrowDropDownIcon sx={{ color: "white" }} />
           </Button>
+          {/* Avatar Menu */}
           <Menu
             id="menu"
             anchorEl={anchorEl}
-            open={open}
+            open={openMenu}
             onClose={handleClose}
             slotProps={{
               list: {
@@ -142,6 +208,67 @@ const NavBar = () => {
               <ListItemText>Logout</ListItemText>
             </MenuItem>
           </Menu>
+
+          {/* SearchData Dropbox */}
+          <Popper
+            id="Search Music DropDown List"
+            open={open}
+            anchorEl={searchDataRef.current}
+            placement={"bottom"}
+            transition
+            sx={{ width: "17%" }}
+          >
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={350}>
+                <Paper
+                  sx={{
+                    maxHeight: "400px",
+                    overflow: "auto",
+                  }}
+                >
+                  <List id="search-dropdown-listbox" role="listbox">
+                    {searchData?.length > 0 &&
+                      searchData.map((data, ind) => (
+                        <ListItem
+                          key={ind}
+                          role="option"
+                          id={`search-option-${ind}`}
+                          aria-selected={highlightedIndex === ind}
+                          disableGutters
+                        >
+                          <ListItemButton
+                            selected={highlightedIndex === ind}
+                            onClick={() => {
+                              setSearchText(data.title);
+                              setOpen(false);
+                            }}
+                            sx={{
+                              // "&:hover": {
+                              //   backgroundColor: "#2196f3",
+                              // },
+                              // "&.Mui-selected, &.Mui-selected:hover": {
+                              //   backgroundColor: "#2196f3",
+                              // },
+                            }}
+                          >
+                            <ListItemIcon>
+                              <img
+                                src={STATIC_URL + data.thumbnailUrl}
+                                alt={`${data.title} Thumbnail`}
+                                width={50}
+                                height={30}
+                                style={{ objectFit: "cover" }}
+                              />
+                            </ListItemIcon>
+                            <ListItemText primary={data.title} />
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                  </List>
+                </Paper>
+              </Fade>
+            )}
+          </Popper>
         </Toolbar>
       </AppBar>
     </Box>
