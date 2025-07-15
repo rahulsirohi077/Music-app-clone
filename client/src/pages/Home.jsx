@@ -26,11 +26,13 @@ const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 const Home = () => {
   const [liked, setLiked] = useState(false);
   const [chartsData, setChartsData] = useState([]);
+  const [selectedTrack,setSelectedTrack] = useState(null);
 
   useEffect(() => {
     const fetchMusic = async () => {
       const response = await fetchMusicList();
       setChartsData(response?.musicList || []);
+      setSelectedTrack(response?.musicList[0]);
     };
     fetchMusic();
   }, []);
@@ -339,6 +341,7 @@ const Home = () => {
                           } minutes and ${
                             formatDuration(data.duration).split(":")[1]
                           } seconds`}
+                          onClick={()=>setSelectedTrack(data)}
                         >
                           <PlayCircleOutlineIcon />
                         </IconButton>
@@ -370,7 +373,7 @@ const Home = () => {
               >
                 Player
               </Typography>
-              <Player />
+              <Player selectedTrack={selectedTrack}/>
             </Stack>
           </Grid>
         </Grid>

@@ -77,18 +77,16 @@ const searchTrack = async (req, res) => {
 
 const streamTrack = async (req, res) => {
   try {
-    const { trackTitle } = req.params;
+    const { trackId } = req.params;
 
-    if (!trackTitle) {
+    if (!trackId) {
       return res.status(403).json({
         success: false,
-        message: "Please Provide trackTitle",
+        message: "Please Provide trackId",
       });
     }
 
-    const track = await Track.findOne({
-      title: { $regex: trackTitle, $options: "i" },
-    });
+    const track = await Track.findById(trackId);
 
     if (!track) {
       return res.status(404).json({

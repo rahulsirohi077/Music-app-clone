@@ -12,5 +12,6 @@ export const userEndpoints = {
 // Track Endpoints
 export const trackEndpoints = {
     FETCH_MUSIC_LIST_API: BASE_URL + "/track/fetch-music-list",
-    SEARCH_API: BASE_URL + "/track/search"
+    SEARCH_API: BASE_URL + "/track/search",
+    STREAM_MUSIC_API: BASE_URL+"/track/stream"
 }

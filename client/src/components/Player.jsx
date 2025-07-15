@@ -18,21 +18,25 @@ import {
   PauseRounded,
   PlayArrowRounded,
 } from "@mui/icons-material";
+import { trackEndpoints } from "../apis/apis";
+const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
-const Player = () => {
+const Player = ({selectedTrack}) => {
   const [paused, setPaused] = useState(true);
-  const [duration, setDuration] = useState(0);
+  // const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef(null);
 
+  // console.log("Paused = ",paused)
+
   // Update duration when metadata is loaded
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const setAudioData = () => setDuration(audio.duration || 0);
-    audio.addEventListener("loadedmetadata", setAudioData);
-    return () => audio.removeEventListener("loadedmetadata", setAudioData);
-  }, []);
+  // useEffect(() => {
+  //   const audio = audioRef.current;
+  //   if (!audio) return;
+  //   const setAudioData = () => setDuration(selectedTrack.duration || 0);
+  //   audio.addEventListener("loadedmetadata", setAudioData);
+  //   return () => audio.removeEventListener("loadedmetadata", setAudioData);
+  // }, [selectedTrack]);
 
   // Update currentTime as audio plays
   useEffect(() => {
@@ -54,6 +58,10 @@ const Player = () => {
     }
   }, [paused]);
 
+  useEffect(()=>{
+    setPaused(true)
+  },[selectedTrack])
+
   // Handle slider change
   const handleSliderChange = (event, value) => {
     const audio = audioRef.current;
@@ -74,7 +82,7 @@ const Player = () => {
     >
       <audio
         ref={audioRef}
-        src="/songs/closer.mp3" 
+        src={`${trackEndpoints.STREAM_MUSIC_API}/${selectedTrack?._id}`} 
         preload="metadata"
       />
       <Container
@@ -99,9 +107,9 @@ const Player = () => {
         >
           <CardMedia
             component="img"
-            alt="Closer Song Thumnail"
+            alt={`${selectedTrack?.title} Thumbnail`}
             height={"55%"}
-            image="/images/closer.jpeg"
+            image={STATIC_URL + selectedTrack?.thumbnailUrl}
             sx={{ objectFit: "contain", padding: 0 }}
           />
           <CardContent
@@ -117,15 +125,15 @@ const Player = () => {
               textAlign={"center"}
               padding={0}
             >
-              Closer
+              {selectedTrack?.title}
             </Typography>
             <Typography variant="body2" textAlign={"center"} padding={0}>
-              The Chainsmokers
+              {selectedTrack?.artist}
             </Typography>
           </CardContent>
           <MusicPlayerSlider
             value={Math.floor(currentTime)}
-            max={duration}
+            max={selectedTrack?.duration}
             onChange={handleSliderChange}
           />
         </Card>
