@@ -18,7 +18,7 @@ const createPlayList = async (req, res) => {
       userId: req.user.id,
     });
     // if exist send error res
-    if (playlist) {
+    if (playlist.length > 0) {
       return res.status(409).json({
         success: false,
         message: "Playlist already exists",
