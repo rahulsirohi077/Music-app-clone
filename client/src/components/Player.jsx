@@ -21,22 +21,11 @@ import {
 import { trackEndpoints } from "../apis/apis";
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
-const Player = ({selectedTrack}) => {
+const Player = ({ selectedTrack }) => {
   const [paused, setPaused] = useState(true);
-  // const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef(null);
-
-  // console.log("Paused = ",paused)
-
-  // Update duration when metadata is loaded
-  // useEffect(() => {
-  //   const audio = audioRef.current;
-  //   if (!audio) return;
-  //   const setAudioData = () => setDuration(selectedTrack.duration || 0);
-  //   audio.addEventListener("loadedmetadata", setAudioData);
-  //   return () => audio.removeEventListener("loadedmetadata", setAudioData);
-  // }, [selectedTrack]);
+  const hasInteracted = useRef(false); // Track if user has pressed play at least once
 
   // Update currentTime as audio plays
   useEffect(() => {
@@ -54,20 +43,49 @@ const Player = ({selectedTrack}) => {
     if (paused) {
       audio.pause();
     } else {
-      audio.play();
+      audio.play().catch(() => {});
+      hasInteracted.current = true; // Mark that user has interacted
     }
   }, [paused]);
 
-  useEffect(()=>{
-    setPaused(true)
-  },[selectedTrack])
+  // When selectedTrack changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    setCurrentTime(0);
+    // If user has already interacted, auto-play new track
+    if (hasInteracted.current) {
+      setPaused(false);
+    } else {
+      setPaused(true);
+    }
+    // console.log(`hasInteracted.current = ${hasInteracted.current} and paused = ${paused}`);
+  }, [selectedTrack]);
+
+  // Add this effect to handle auto-play when selectedTrack changes and should play
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const tryAutoPlay = () => {
+      if (!paused && hasInteracted.current) {
+        audio.play().catch(() => {});
+      }
+    };
+
+    audio.addEventListener("canplay", tryAutoPlay);
+
+    return () => {
+      audio.removeEventListener("canplay", tryAutoPlay);
+    };
+  }, [selectedTrack, paused]);
 
   // Handle slider change
   const handleSliderChange = (event, value) => {
     const audio = audioRef.current;
-    // console.log("audio = ",audio)
     if (audio) {
-      // console.log("audio.currentTime = ",audio.currentTime)
       audio.currentTime = value;
       setCurrentTime(value);
     }

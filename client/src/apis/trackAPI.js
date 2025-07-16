@@ -9,7 +9,7 @@ const fetchMusicList = async () => {
       "GET",
       trackEndpoints.FETCH_MUSIC_LIST_API
     );
-    console.log("response = ", response);
+    // console.log("response = ", response);
     toast.success(response?.data?.message, { id: toastId });
     return response.data;
   } catch (error) {
@@ -24,7 +24,7 @@ const searchTrack = async (trackTitle) => {
     const response = await apiconnector("POST", trackEndpoints.SEARCH_API, {
       trackTitle,
     });
-    console.log("response = ", response);
+    // console.log("response = ", response);
     toast.success(response?.data?.message, { id: toastId });
     return response.data;
   } catch (error) {

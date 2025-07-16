@@ -8,6 +8,7 @@ const playlistSchema = new Schema({
     },
     userId:{
         type:Types.ObjectId,
+        required:true,
         ref:"User"
     },
     tracks:[

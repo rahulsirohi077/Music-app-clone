@@ -9,14 +9,15 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProtectRoute from "./components/auth/ProtectRoute";
 import Settings from "./pages/Settings";
+import PlayList from "./pages/PlayList"
 
 function App() {
   const { user, setUser } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
-  console.log("User => ",user)
+  // console.log("User => ",user)
 
   useEffect(() => {
-    console.log("use Effect ran")
+    // console.log("use Effect ran")
     let toastId;
     const getUserInfo = async () => {
       toastId = toast.loading("Loading...");
@@ -39,6 +40,7 @@ function App() {
             <Route element={<ProtectRoute user={user} />}>
               <Route element={<Home />} path="/" />
               <Route element={<Settings/>} path="/settings"/>
+              <Route element={<PlayList/>} path="/playlists"/>
             </Route>
             <Route element={<ProtectRoute user={!user} redirect="/"/>}>
               <Route element={<Login />} path="/login" />

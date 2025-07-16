@@ -5,6 +5,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.js';
 import trackRoutes from './routes/track.js';
+import playlistRoutes from './routes/playlist.js'
 import path from 'path';
 
 global.appRoot = path.resolve();
@@ -31,6 +32,7 @@ app.use(cors({
 
 app.use("/api/v1/user", userRoutes)
 app.use("/api/v1/track", trackRoutes)
+app.use("/api/v1/playlist",playlistRoutes)
 
 app.get("/",(req,res)=>{
     res.send('hello world');

@@ -15,3 +15,12 @@ export const trackEndpoints = {
     SEARCH_API: BASE_URL + "/track/search",
     STREAM_MUSIC_API: BASE_URL+"/track/stream"
 }
+
+// PlayList Endpoints
+export const playlistEndpoints = {
+    CREATE_PLAYLIST_API: BASE_URL + "/playlist/create",
+    ADD_TO_PLAYLIST_API: BASE_URL + "/playlist/add",
+    REMOVE_FROM_PLAYLIST_API: BASE_URL + "/playlist/remove",
+    FETCH_ALL_PLAYLISTS_API: BASE_URL + "/playlist/fetch-all",
+    FETCH_PLAYLIST_BY_ID_API: BASE_URL + "/playlist/fetch",
+}

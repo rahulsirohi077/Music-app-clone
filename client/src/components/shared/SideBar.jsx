@@ -1,10 +1,12 @@
 import { Box, Stack, Typography, IconButton, Button } from '@mui/material'
 import React from 'react'
 import HomeIcon from '@mui/icons-material/Home';
-import SearchIcon from '@mui/icons-material/Search';
-import AlbumIcon from '@mui/icons-material/Album';
+import QueueMusicIcon from '@mui/icons-material/QueueMusic';
+import { useNavigate } from 'react-router-dom';
 
 const SideBar = () => {
+  const navigate = useNavigate();
+
   return (
     <Box
       width={{ xs: "100%", sm: "100%" }}
@@ -49,10 +51,11 @@ const SideBar = () => {
             },
           }}
           tabIndex={0}
+          onClick={()=>navigate("/")}
         >
           Home
         </Button>
-        <Button
+        {/* <Button
           fullWidth
           startIcon={
             <SearchIcon sx={{ color: "#ececee", fontSize: { xs: 22, sm: 26 } }} />
@@ -74,13 +77,14 @@ const SideBar = () => {
             },
           }}
           tabIndex={0}
+          onClick={}
         >
           Search
-        </Button>
+        </Button> */}
         <Button
           fullWidth
           startIcon={
-            <AlbumIcon sx={{ color: "#ececee", fontSize: { xs: 22, sm: 26 } }} />
+            <QueueMusicIcon sx={{ color: "#ececee", fontSize: { xs: 22, sm: 26 } }} />
           }
           sx={{
             justifyContent: "flex-start",
@@ -99,8 +103,9 @@ const SideBar = () => {
             },
           }}
           tabIndex={0}
+          onClick={()=>navigate("/playlists")}
         >
-          Library
+          PlayLists
         </Button>
       </Stack>
     </Box>

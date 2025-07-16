@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AppLayout from "../components/layout/AppLayout";
 import {
   Box,
@@ -6,7 +6,9 @@ import {
   Container,
   Grid,
   IconButton,
+  Modal,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import NavBar from "../components/shared/NavBar";
@@ -17,16 +19,23 @@ import CardItem from "../components/shared/CardItem";
 import { artistData } from "../data/artists";
 import { genreData } from "../data/genre";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-// import { chartsData } from "../data/charts";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import Player from "../components/Player";
-import { useEffect } from "react";
 import { fetchMusicList } from "../apis/trackAPI";
+import { createPlayList, addToPlaylist } from "../apis/playlistAPI";
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const Home = () => {
   const [liked, setLiked] = useState(false);
   const [chartsData, setChartsData] = useState([]);
-  const [selectedTrack,setSelectedTrack] = useState(null);
+  const [selectedTrack, setSelectedTrack] = useState(null);
+
+  // Modal state for adding to playlist
+  const [modalOpen, setModalOpen] = useState(false);
+  const [playlistName, setPlaylistName] = useState("");
+  const [trackToAdd, setTrackToAdd] = useState(null);
+  const [isCreating, setIsCreating] = useState(false); // for create playlist mode
+  const playlistInputRef = useRef(null);
 
   useEffect(() => {
     const fetchMusic = async () => {
@@ -37,11 +46,38 @@ const Home = () => {
     fetchMusic();
   }, []);
 
+  useEffect(() => {
+    if (modalOpen && playlistInputRef.current) {
+      playlistInputRef.current.focus();
+      playlistInputRef.current.select();
+    }
+  }, [modalOpen, isCreating]);
+
   function formatDuration(value) {
     const minute = Math.floor(value / 60);
     const secondLeft = value - minute * 60;
     return `${minute}:${secondLeft < 10 ? `0${secondLeft}` : secondLeft}`;
   }
+
+  // Function to handle adding track to playlist
+  const handleAddToPlaylist = async () => {
+    if (!playlistName || !trackToAdd) return;
+    await addToPlaylist({
+      playListName: playlistName,
+      trackId: trackToAdd._id,
+    });
+    setModalOpen(false);
+    setPlaylistName("");
+    setTrackToAdd(null);
+    setIsCreating(false);
+  };
+
+  // Function to handle creating a new playlist
+  const handleCreatePlaylist = async () => {
+    if (!playlistName) return;
+    await createPlayList(playlistName);
+    setIsCreating(false);
+  };
 
   return (
     <Stack sx={{ height: "100vh" }}>
@@ -100,9 +136,8 @@ const Home = () => {
           mt={2}
           mb={2}
           sx={{
-            // No calculations needed! Flex automatically takes remaining space
             flex: 1,
-            minHeight: 0, // Important for flex children with overflow
+            minHeight: 0,
           }}
         >
           {/* left section */}
@@ -113,20 +148,13 @@ const Home = () => {
             spacing={2}
             height={"100%"}
             direction={"column"}
-            // sx={{
-            //   flex:1,
-            //   flexDirection:"column"
-            // }}
-            // bgcolor={red[500]}
           >
             {/* Artist section */}
             <Grid
               item
               size={12}
               bgcolor={"#212028"}
-              // height={"35%"}
               sx={{
-                // flex: 1,
                 height: "35%",
               }}
               direction={"column"}
@@ -140,19 +168,11 @@ const Home = () => {
                   Artist
                 </Typography>
                 <Box
-                  // height={"85%"}
-                  // width={"100%"}
                   display={"flex"}
-                  // bgcolor={yellow[500]}
-                  // height={"100%"}
                   sx={{
                     flex: 1,
-                    minHeight: 0, // Important for flex children with overflow
-                    // height: "100%",
-
-                    // miaxHeght: "calc(100% - 32px)", // Subtract Typography height + margin
+                    minHeight: 0,
                   }}
-                  // flexDirection={"row"}
                   justifyContent={"space-around"}
                   alignItems={"center"}
                   tabIndex={0}
@@ -178,18 +198,9 @@ const Home = () => {
               size={12}
               direction={"row"}
               height={"60%"}
-              sx={
-                {
-                  // minHeight: 0, // Important for flex children with overflow
-                  // flex: 1,
-                  // maxHeight: "calc(100% - 32px)", // Subtract Typography height + margin
-                  // height: "60%",
-                }
-              }
             >
               {/* genre */}
               <Grid
-                // container
                 size={5}
                 bgcolor={"#212028"}
                 borderRadius={3}
@@ -207,14 +218,13 @@ const Home = () => {
                   Genre
                 </Typography>
                 <Grid
-                  // bgcolor={red[500]}
                   container
                   direction={"row"}
                   spacing={1}
                   sx={{
                     flex: 1,
                     overflow: "auto",
-                    mt: 0, // Remove top margin
+                    mt: 0,
                   }}
                 >
                   {genreData.map((data) => (
@@ -229,7 +239,7 @@ const Home = () => {
                       alignItems={"center"}
                       sx={{
                         minHeight: "40px",
-                        mb: 1, // Small bottom margin between items
+                        mb: 1,
                       }}
                       tabIndex={0}
                     >
@@ -252,14 +262,12 @@ const Home = () => {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  minHeight: 0, // Allows the grid to shrink below content height
-                  /* Hide scrollbar for Chrome, Safari and Opera */
+                  minHeight: 0,
                   "&::-webkit-scrollbar": {
                     display: "none",
                   },
-                  /* Hide scrollbar for IE, Edge and Firefox */
-                  scrollbarWidth: "none", // Firefox
-                  msOverflowStyle: "none", // IE and Edge
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
                 }}
                 tabIndex={0}
                 aria-labelledby="top-charts"
@@ -318,13 +326,13 @@ const Home = () => {
                           {formatDuration(data.duration)}
                         </Typography>
                       </Grid>
-
                       <Grid
                         size={2}
                         sx={{
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
+                          gap: 1,
                         }}
                       >
                         <IconButton
@@ -341,9 +349,19 @@ const Home = () => {
                           } minutes and ${
                             formatDuration(data.duration).split(":")[1]
                           } seconds`}
-                          onClick={()=>setSelectedTrack(data)}
+                          onClick={() => setSelectedTrack(data)}
                         >
                           <PlayCircleOutlineIcon />
+                        </IconButton>
+                        <IconButton
+                          color="secondary"
+                          aria-label={`Add ${data.title} to playlist`}
+                          onClick={() => {
+                            setTrackToAdd(data);
+                            setModalOpen(true);
+                          }}
+                        >
+                          <PlaylistAddIcon />
                         </IconButton>
                       </Grid>
                     </Grid>
@@ -359,7 +377,6 @@ const Home = () => {
             size={5}
             bgcolor={"#212028"}
             height={"100%"}
-            // padding={2}
             borderRadius={3}
             tabIndex={0}
             aria-labelledby="player-heading"
@@ -373,10 +390,74 @@ const Home = () => {
               >
                 Player
               </Typography>
-              <Player selectedTrack={selectedTrack}/>
+              <Player selectedTrack={selectedTrack} />
             </Stack>
           </Grid>
         </Grid>
+        {/* Modal for adding to playlist */}
+        <Modal
+          open={modalOpen}
+          onClose={() => {
+            setModalOpen(false);
+            setIsCreating(false);
+          }}
+          aria-labelledby="add-to-playlist-modal"
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+              minWidth: 300,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            <Typography id="add-to-playlist-modal" variant="h6">
+              {isCreating
+                ? "Create New Playlist"
+                : `Add "${trackToAdd?.title}" to Playlist`}
+            </Typography>
+            <TextField
+              label="Playlist Name"
+              value={playlistName}
+              onChange={(e) => setPlaylistName(e.target.value)}
+              inputRef={playlistInputRef}
+              fullWidth
+            />
+            <Stack direction="row" spacing={2}>
+              {!isCreating && (
+                <Button
+                  variant="contained"
+                  onClick={handleAddToPlaylist}
+                  disabled={!playlistName}
+                >
+                  Add to Playlist
+                </Button>
+              )}
+              <Button
+                variant={isCreating ? "contained" : "outlined"}
+                color="secondary"
+                onClick={() => {
+                  if (isCreating) {
+                    handleCreatePlaylist();
+                  } else {
+                    setIsCreating(true);
+                  }
+                }}
+                disabled={!playlistName}
+              >
+                {isCreating ? "Create" : "Create New Playlist"}
+              </Button>
+            </Stack>
+          </Box>
+        </Modal>
       </Container>
     </Stack>
   );
