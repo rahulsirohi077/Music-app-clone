@@ -175,7 +175,7 @@ const removeFromPlayList = async (req, res) => {
 const fetchAllPlaylists = async (req, res) => {
   try {
     // fetch all playlists for the user
-    const playlists = await PlayList.find({ userId: req.user.id });
+    const playlists = await PlayList.find({ userId: req.user.id }).populate("tracks");
 
     // Add trackCount to each playlist
     const playlistsWithCount = playlists.map(playlist => ({

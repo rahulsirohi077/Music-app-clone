@@ -8,7 +8,8 @@ import { Box, IconButton, Slider, Stack, Typography } from "@mui/material";
 
 const MusicPlayerSlider = ({ value, max, onChange }) => {
   const duration = Math.floor(max); // seconds
-//   console.log("max = ", max)
+  // console.log("max = ", max)
+  // console.log("value = ", value)
   function formatDuration(value) {
     const minute = Math.floor(value / 60);
     const secondLeft = value - minute * 60;

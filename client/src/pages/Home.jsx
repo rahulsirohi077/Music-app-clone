@@ -143,7 +143,7 @@ const Home = () => {
           {/* left section */}
           <Grid
             container
-            item
+            // item
             size={7}
             spacing={2}
             height={"100%"}
@@ -198,6 +198,10 @@ const Home = () => {
               size={12}
               direction={"row"}
               height={"60%"}
+              // sx={{
+              //   display:"flex",
+              //   flexDirection:"row"
+              // }}
             >
               {/* genre */}
               <Grid
@@ -327,7 +331,7 @@ const Home = () => {
                         </Typography>
                       </Grid>
                       <Grid
-                        size={2}
+                        size={3}
                         sx={{
                           display: "flex",
                           alignItems: "center",

@@ -27,14 +27,32 @@ const Player = ({ selectedTrack }) => {
   const audioRef = useRef(null);
   const hasInteracted = useRef(false); // Track if user has pressed play at least once
 
-  // Update currentTime as audio plays
+  // Handle audio reset and timeupdate when selectedTrack changes
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    // Reset audio and currentTime
+    audio.pause();
+    audio.currentTime = 0;
+    setCurrentTime(0);
+
+    // If user has already interacted, auto-play new track
+    if (hasInteracted.current) {
+      setPaused(false);
+    } else {
+      setPaused(true);
+    }
+
+    // Setup timeupdate listener
     const updateTime = () => setCurrentTime(audio.currentTime);
     audio.addEventListener("timeupdate", updateTime);
-    return () => audio.removeEventListener("timeupdate", updateTime);
-  }, []);
+
+    // Cleanup
+    return () => {
+      audio.removeEventListener("timeupdate", updateTime);
+    };
+  }, [selectedTrack]);
 
   // Play/pause audio when state changes
   useEffect(() => {
@@ -48,23 +66,7 @@ const Player = ({ selectedTrack }) => {
     }
   }, [paused]);
 
-  // When selectedTrack changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    audio.currentTime = 0;
-    setCurrentTime(0);
-    // If user has already interacted, auto-play new track
-    if (hasInteracted.current) {
-      setPaused(false);
-    } else {
-      setPaused(true);
-    }
-    // console.log(`hasInteracted.current = ${hasInteracted.current} and paused = ${paused}`);
-  }, [selectedTrack]);
-
-  // Add this effect to handle auto-play when selectedTrack changes and should play
+  // Handle auto-play when selectedTrack changes and should play
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -91,6 +93,26 @@ const Player = ({ selectedTrack }) => {
     }
   };
 
+  // Reset player when track ends
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      setPaused(true);
+      setCurrentTime(0);
+      audio.currentTime = 0;
+    };
+
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [selectedTrack]);
+
+  if(!selectedTrack) return (<Typography align="center">Please Select a track</Typography>)
+
   return (
     <Stack
       sx={{
@@ -105,8 +127,6 @@ const Player = ({ selectedTrack }) => {
       />
       <Container
         sx={{
-          // bgcolor:"red",
-          // flex: 1,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
