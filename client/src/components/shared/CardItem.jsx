@@ -10,19 +10,20 @@ const CardItem = ({src,alt,artistName,plays}) => {
         bgcolor: "transparent",
       }}
       elevation={0}
+      tabIndex={0}
     >
       <CardMedia
         component="img"
-        sx={{ height: "60%", objectFit: "cover", borderRadius: 2 }}
+        sx={{ height: {xs:"50%",md:"60%"}, objectFit: "cover", borderRadius: 2 }}
         image={src}
         alt={alt}
       />
-      <CardContent sx={{ p: 0, height: "100%" }}>
+      <CardContent sx={{ p: 1, height: "70%" }}>
         <Stack>
           <Typography
             variant="caption"
             textAlign={"center"}
-            sx={{ fontSize:{ md:"0.7rem",sm:"0.5rem",xs:"0.3rem" } }}
+            sx={{ fontSize:{ md:"0.7rem",sm:"0.6rem",xs:"0.5rem" } }}
             color="#bcbbbf"
           >
             {artistName}
@@ -30,7 +31,7 @@ const CardItem = ({src,alt,artistName,plays}) => {
           <Typography
             variant="caption"
             textAlign={"center"}
-            sx={{ fontSize: {md:"0.7rem",sm:"0.5rem",xs:"0.4rem" }}}
+            sx={{ fontSize: {md:"0.7rem",sm:"0.6rem",xs:"0.5rem" }}}
             color="#65666c"
           >
             {plays}

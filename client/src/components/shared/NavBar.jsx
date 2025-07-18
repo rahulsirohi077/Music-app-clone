@@ -6,7 +6,9 @@ import {
   Box,
   Button,
   Divider,
+  Drawer,
   Fade,
+  IconButton,
   InputAdornment,
   Link,
   List,
@@ -23,12 +25,15 @@ import {
   Typography,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { searchTrack } from "../../apis/trackAPI";
+import MenuIcon from "@mui/icons-material/Menu";
+import { UserContext } from "../../context/UserContext";
+import SideBar from "./SideBar";
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
-const NavBar = () => {
+const NavBar = ({setSelectedTrack}) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [searchData, setSearchData] = useState([]);
@@ -38,6 +43,14 @@ const NavBar = () => {
   const [highlightedIndex, setHighlightedIndex] = useState(0);
 
   const [searchText, setSearchText] = useState("");
+
+  // const {setOpenSideBar} = useContext(UserContext);
+
+  const { openSidebar, setOpenSidebar } = useContext(UserContext);
+
+  const handleSideBarClose = () => {
+    setOpenSidebar(false);
+  };
 
   useEffect(() => {
     setHighlightedIndex(0);
@@ -51,8 +64,7 @@ const NavBar = () => {
         if (data) {
           setSearchData(data.tracks);
           setOpen(true);
-        }
-        else{
+        } else {
           setOpen(false);
         }
       }
@@ -79,7 +91,9 @@ const NavBar = () => {
       // Handle selection (e.g., navigate or fill input)
       const selected = searchData[highlightedIndex];
       if (selected) {
-        setSearchText(selected.title);
+        // console.log("selected = ",selected)
+        setSearchText('');
+        setSelectedTrack(selected);
         setOpen(false);
         // Optionally, trigger navigation or other action here
       }
@@ -98,7 +112,11 @@ const NavBar = () => {
   };
 
   return (
-    <Box py={"1rem"}>
+    <>
+     <Drawer open={openSidebar} onClose={handleSideBarClose}>
+        <SideBar />
+      </Drawer>
+    <Box pt={"1rem"}>
       <AppBar
         position="static"
         sx={{
@@ -106,6 +124,12 @@ const NavBar = () => {
         }}
       >
         <Toolbar>
+          <IconButton
+            sx={{ display: { xs: "flex", md: "none" }, color: "white" }}
+            onClick={() => setOpenSidebar((p) => !p)}
+          >
+            <MenuIcon />
+          </IconButton>
           <Typography variant="button" sx={{ flexGrow: 1 }}>
             Music
           </Typography>
@@ -115,8 +139,8 @@ const NavBar = () => {
             onBlur={() => setOpen(false)}
             onKeyDown={handleKeyDown}
             onChange={(e) => setSearchText(e.target.value)}
-            onFocus={()=>{
-              if(searchData?.length>0) setOpen(true)
+            onFocus={() => {
+              if (searchData?.length > 0) setOpen(true);
             }}
             aria-label="Search Song"
             aria-controls="search-dropdown-listbox"
@@ -130,6 +154,7 @@ const NavBar = () => {
             type="text"
             placeholder="Type Here to Search"
             sx={{
+              width:{xs:"10rem"},
               input: {
                 color: "#d3d3d3",
                 backgroundColor: "#1d1d1d",
@@ -137,6 +162,7 @@ const NavBar = () => {
                 "&::placeholder": {
                   color: "#d3d3d3",
                   opacity: 1,
+                  fontSize:{xs:"0.6rem"}
                 },
               },
               "& .MuiOutlinedInput-root": {
@@ -216,7 +242,7 @@ const NavBar = () => {
             anchorEl={searchDataRef.current}
             placement={"bottom"}
             transition
-            sx={{ width: "17%" }}
+            sx={{ width: "fit-content" }}
           >
             {({ TransitionProps }) => (
               <Fade {...TransitionProps} timeout={350}>
@@ -239,17 +265,20 @@ const NavBar = () => {
                           <ListItemButton
                             selected={highlightedIndex === ind}
                             onClick={() => {
-                              setSearchText(data.title);
+                              setSearchText('');
+                              setSelectedTrack(searchData[ind])
                               setOpen(false);
                             }}
-                            sx={{
-                              // "&:hover": {
-                              //   backgroundColor: "#2196f3",
-                              // },
-                              // "&.Mui-selected, &.Mui-selected:hover": {
-                              //   backgroundColor: "#2196f3",
-                              // },
-                            }}
+                            sx={
+                              {
+                                // "&:hover": {
+                                //   backgroundColor: "#2196f3",
+                                // },
+                                // "&.Mui-selected, &.Mui-selected:hover": {
+                                //   backgroundColor: "#2196f3",
+                                // },
+                              }
+                            }
                           >
                             <ListItemIcon>
                               <img
@@ -272,6 +301,7 @@ const NavBar = () => {
         </Toolbar>
       </AppBar>
     </Box>
+    </>
   );
 };
 

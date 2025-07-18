@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import AppLayout from "../components/layout/AppLayout";
 import {
   Box,
@@ -15,15 +15,19 @@ import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import Player from "../components/Player";
 import { fetchAllPlaylists } from "../apis/playlistAPI";
-// import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MenuIcon from "@mui/icons-material/Menu";
+import BottomPlayerBar from "../components/BottomPlayerBar";
+import { UserContext } from "../context/UserContext";
+import NavBar from "../components/shared/NavBar";
+
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const PlayLists = () => {
   const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [selectedTrack, setSelectedTrack] = useState(null);
-  // const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchPlaylistsData = async () => {
@@ -43,7 +47,6 @@ const PlayLists = () => {
 
   const handlePlaylistSelect = (playlist) => {
     setSelectedPlaylist(playlist);
-    console.log(playlist);
   };
 
   const handleOnKeyDown = (e) => {
@@ -55,18 +58,20 @@ const PlayLists = () => {
   const handleBack = () => {
     setSelectedPlaylist(null);
     setSelectedTrack(null);
-  }
+  };
 
   return (
     <>
+      <NavBar setSelectedTrack={setSelectedTrack}/>
       <Container
         sx={{
-          height: "100vh",
+          height: "93vh",
+          width: "100vw",
           display: "flex",
           flexDirection: "column",
           p: 2,
         }}
-      >
+        >
         <Box
           sx={{
             bgcolor: blue[500],
@@ -74,6 +79,9 @@ const PlayLists = () => {
             height: "200px",
             borderRadius: 2,
             position: "relative",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           {selectedPlaylist && (
@@ -84,14 +92,30 @@ const PlayLists = () => {
               <ArrowBackIcon fontSize="large" sx={{ color: "white" }} />
             </IconButton>
           )}
-          <Typography variant="h1" align="center">
+          <Typography
+            align="center"
+            sx={{
+              fontSize: { xs: "2rem", md: "2.5rem" },
+              fontWeight: 700,
+            }}
+          >
             {selectedPlaylist ? selectedPlaylist.name : "PlayLists"}
           </Typography>
         </Box>
 
         {!selectedPlaylist ? (
           <Box mt={3}>
-            <Stack spacing={2}>
+            <Stack
+              spacing={2}
+              sx={{
+                overflow: "auto",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
               {playlists.map((pl) => (
                 <Card
                   key={pl._id}
@@ -118,21 +142,21 @@ const PlayLists = () => {
           </Box>
         ) : (
           // Parent Grid of Playlist and Player
-          <Grid container mt={3} sx={{ flex: 1,minHeight:0 }} spacing={2}>
+          <Grid container mt={3} sx={{ flex: 1, minHeight: 0 }} spacing={2}>
             {/* Playlists Tracks Section */}
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Grid
                 item
                 size={12}
                 bgcolor={"#212028"}
                 padding={2}
                 borderRadius={3}
-                height={"100%"}
+                height={{ xs: "75%", md: "100%" }}
                 overflow={"auto"}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap:2,
+                  gap: 2,
                   minHeight: 0,
                   "&::-webkit-scrollbar": {
                     display: "none",
@@ -166,7 +190,7 @@ const PlayLists = () => {
                             {index + 1}
                           </Typography>
                         </Grid>
-                        <Grid size={6}>
+                        <Grid size={7}>
                           <Stack direction={"row"} spacing={2} width={"full"}>
                             <img
                               src={STATIC_URL + data.thumbnailUrl}
@@ -257,6 +281,9 @@ const PlayLists = () => {
               borderRadius={3}
               tabIndex={0}
               aria-labelledby="player-heading"
+              sx={{
+                display: { xs: "none", md: "block" },
+              }}
             >
               <Stack height={"100%"}>
                 <Typography
@@ -271,6 +298,9 @@ const PlayLists = () => {
               </Stack>
             </Grid>
           </Grid>
+        )}
+        {selectedTrack && (
+          <BottomPlayerBar selectedTrack={selectedTrack} />
         )}
       </Container>
     </>

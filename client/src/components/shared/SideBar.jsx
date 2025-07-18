@@ -1,11 +1,13 @@
 import { Box, Stack, Typography, IconButton, Button } from '@mui/material'
-import React from 'react'
+import React, { useContext } from 'react'
 import HomeIcon from '@mui/icons-material/Home';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../context/UserContext';
 
 const SideBar = () => {
   const navigate = useNavigate();
+  const { setOpenSidebar } = useContext(UserContext);
 
   return (
     <Box
@@ -23,7 +25,8 @@ const SideBar = () => {
         variant='h5'
         sx={{
           textAlign: "center",
-          fontSize: { xs: "1.1rem", sm: "2rem" }
+          fontSize: { xs: "1.1rem", sm: "2rem" },
+          color: "#ececee"
         }}
       >
         Music App
@@ -51,7 +54,10 @@ const SideBar = () => {
             },
           }}
           tabIndex={0}
-          onClick={()=>navigate("/")}
+          onClick={()=>{
+            setOpenSidebar(false)
+            navigate("/")
+          }}
         >
           Home
         </Button>
@@ -103,7 +109,10 @@ const SideBar = () => {
             },
           }}
           tabIndex={0}
-          onClick={()=>navigate("/playlists")}
+          onClick={()=>{
+            setOpenSidebar(false)
+            navigate("/playlists")
+          }}
         >
           PlayLists
         </Button>

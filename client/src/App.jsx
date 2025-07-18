@@ -9,7 +9,8 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProtectRoute from "./components/auth/ProtectRoute";
 import Settings from "./pages/Settings";
-import PlayList from "./pages/PlayList"
+import PlayList from "./pages/PlayList";
+import AppLayout from "./components/layout/AppLayout";
 
 function App() {
   const { user, setUser } = useContext(UserContext);
@@ -39,10 +40,10 @@ function App() {
           <Routes>
             <Route element={<ProtectRoute user={user} />}>
               <Route element={<Home />} path="/" />
-              <Route element={<Settings/>} path="/settings"/>
-              <Route element={<PlayList/>} path="/playlists"/>
+              <Route element={<Settings />} path="/settings" />
+              <Route element={<PlayList />} path="/playlists" />
             </Route>
-            <Route element={<ProtectRoute user={!user} redirect="/"/>}>
+            <Route element={<ProtectRoute user={!user} redirect="/" />}>
               <Route element={<Login />} path="/login" />
               <Route element={<SignUp />} path="/signup" />
             </Route>

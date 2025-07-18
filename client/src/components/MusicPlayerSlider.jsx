@@ -37,7 +37,7 @@ const MusicPlayerSlider = ({ value, max, onChange }) => {
           onChange(_, value);
         }}
         sx={() => ({
-          maxWidth: { sm: "50%", md: "60%", xs: "40%" },
+          maxWidth: { sm: "50%", md: "60%", xs: "50%" },
         })}
       />
       <Typography variant="body2">

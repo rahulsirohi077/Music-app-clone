@@ -23,6 +23,7 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import Player from "../components/Player";
 import { fetchMusicList } from "../apis/trackAPI";
 import { createPlayList, addToPlaylist } from "../apis/playlistAPI";
+import BottomPlayerBar from "../components/BottomPlayerBar";
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const Home = () => {
@@ -81,14 +82,14 @@ const Home = () => {
 
   return (
     <Stack sx={{ height: "100vh" }}>
-      <NavBar />
+      <NavBar setSelectedTrack={setSelectedTrack}/>
       <Container
         maxWidth={false}
         component="main"
         sx={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
       >
         {/* hero Section */}
-        <Stack spacing={3}>
+        <Stack spacing={{xs:1,md:3}}>
           <Typography variant="body1">Trending New Hits</Typography>
 
           <Stack>
@@ -132,7 +133,7 @@ const Home = () => {
 
         <Grid
           container
-          spacing={2}
+          spacing={{xs:1,md:2}}
           mt={2}
           mb={2}
           sx={{
@@ -144,9 +145,9 @@ const Home = () => {
           <Grid
             container
             // item
-            size={7}
-            spacing={2}
-            height={"100%"}
+            size={{xs:12,md:7}}
+            spacing={{xs:1,md:2}}
+            height={{xs:"85%",md:"100%"}}
             direction={"column"}
           >
             {/* Artist section */}
@@ -155,7 +156,8 @@ const Home = () => {
               size={12}
               bgcolor={"#212028"}
               sx={{
-                height: "35%",
+                height:{xs:'30%',md:"35%"},
+                // height:"fit-content"
               }}
               direction={"column"}
               paddingX={2}
@@ -186,6 +188,7 @@ const Home = () => {
                       alt={data.alt}
                       artistName={data.artistName}
                       plays={data.plays}
+                      tabIndex={0}
                     />
                   ))}
                 </Box>
@@ -194,7 +197,7 @@ const Home = () => {
             {/* genre and top charts */}
             <Grid
               container
-              spacing={3}
+              spacing={{xs:1,md:3}}
               size={12}
               direction={"row"}
               height={"60%"}
@@ -205,7 +208,7 @@ const Home = () => {
             >
               {/* genre */}
               <Grid
-                size={5}
+                size={{xs:3,md:5}}
                 bgcolor={"#212028"}
                 borderRadius={3}
                 height={"100%"}
@@ -214,6 +217,7 @@ const Home = () => {
                   padding: 1,
                   display: "flex",
                   flexDirection: "column",
+                  overflow:"auto",
                 }}
                 tabIndex={0}
                 aria-labelledby="genre"
@@ -223,18 +227,23 @@ const Home = () => {
                 </Typography>
                 <Grid
                   container
-                  direction={"row"}
+                  // direction={{xs:"column",md:"row"}}
                   spacing={1}
                   sx={{
                     flex: 1,
                     overflow: "auto",
                     mt: 0,
+                    "&::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
                   }}
                 >
                   {genreData.map((data) => (
                     <Grid
                       item
-                      size={6}
+                      size={{xs:12,md:6}}
                       key={data.id}
                       bgcolor={data.bgColor}
                       borderRadius={3}
@@ -242,7 +251,7 @@ const Home = () => {
                       justifyContent={"center"}
                       alignItems={"center"}
                       sx={{
-                        minHeight: "40px",
+                        minHeight: "30px",
                         mb: 1,
                       }}
                       tabIndex={0}
@@ -257,9 +266,11 @@ const Home = () => {
               {/* top charts */}
               <Grid
                 item
-                size={7}
+                size={{xs:9,md:7}}
                 bgcolor={"#212028"}
-                padding={2}
+                py={2}
+                paddingLeft={{xs:1,md:2}}
+                paddingRight={2}
                 borderRadius={3}
                 height={"100%"}
                 overflow={"auto"}
@@ -289,20 +300,24 @@ const Home = () => {
                       justifyContent={"space-between"}
                       mt={1}
                     >
-                      <Grid size={1}>
+                      <Grid size={1} sx={{display:"flex",justifyContent:"flex-start",alignItems:"center"}}>
                         <Typography variant="overline">{index + 1}</Typography>
                       </Grid>
                       <Grid size={6}>
                         <Stack direction={"row"} spacing={2} width={"full"}>
-                          <img
+                          <Box
+                            component="img"
                             src={STATIC_URL + data.thumbnailUrl}
                             alt={`${data.title} Thumbnail`}
-                            width={50}
-                            height={30}
-                            style={{ objectFit: "cover" }}
+                            sx={{
+                              width: { xs: 30, md: 50 },
+                              height: { xs: 20, md: 30 }, // example responsive height
+                              objectFit: "cover",
+                              alignSelf:"center"
+                            }}
                           />
                           <Stack direction={"column"}>
-                            <Typography variant="body2">
+                            <Typography variant="body2" sx={{fontSize:{xs:"0.7rem"}}}>
                               {data.title}
                             </Typography>
                             <Typography
@@ -336,7 +351,7 @@ const Home = () => {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          gap: 1,
+                          gap:{xs:0,md:1}
                         }}
                       >
                         <IconButton
@@ -345,6 +360,7 @@ const Home = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            marginLeft:2
                           }}
                           aria-label={`Play ${data.title} by ${
                             data.artist
@@ -354,6 +370,7 @@ const Home = () => {
                             formatDuration(data.duration).split(":")[1]
                           } seconds`}
                           onClick={() => setSelectedTrack(data)}
+                          size="small"
                         >
                           <PlayCircleOutlineIcon />
                         </IconButton>
@@ -364,6 +381,7 @@ const Home = () => {
                             setTrackToAdd(data);
                             setModalOpen(true);
                           }}
+                          size="small"
                         >
                           <PlaylistAddIcon />
                         </IconButton>
@@ -384,6 +402,7 @@ const Home = () => {
             borderRadius={3}
             tabIndex={0}
             aria-labelledby="player-heading"
+            display={{xs:"none",md:"block"}}
           >
             <Stack height={"100%"}>
               <Typography
@@ -462,6 +481,12 @@ const Home = () => {
             </Stack>
           </Box>
         </Modal>
+        {selectedTrack && (
+          <BottomPlayerBar
+            selectedTrack={selectedTrack}
+            // setSelectedTrack={setSelectedTrack}
+          />
+        )}
       </Container>
     </Stack>
   );
