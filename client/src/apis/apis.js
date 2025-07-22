@@ -6,7 +6,8 @@ export const userEndpoints = {
     SIGNUP_API: BASE_URL + "/user/signup",
     GETUSER_API: BASE_URL+ "/user/get-user-info",
     REFRESH_TOKENS_API: BASE_URL+ "/user/refresh",
-    UPDATE_INFO_API: BASE_URL+"/user/update-info"
+    UPDATE_INFO_API: BASE_URL+"/user/update-info",
+    LOGOUT_API:BASE_URL+"/user/logout"
 }
 
 // Track Endpoints

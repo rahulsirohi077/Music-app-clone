@@ -2,6 +2,7 @@ import express from "express";
 import {
   getUser,
   login,
+  Logout,
   refreshTokens,
   signUp,
   updateInfo,
@@ -24,5 +25,6 @@ app.post(
 );
 
 app.get("/get-user-info", auth, getUser);
+app.get("/logout",auth,Logout)
 
 export default app;

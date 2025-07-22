@@ -31,6 +31,7 @@ import { searchTrack } from "../../apis/trackAPI";
 import MenuIcon from "@mui/icons-material/Menu";
 import { UserContext } from "../../context/UserContext";
 import SideBar from "./SideBar";
+import { logout } from "../../apis/userAPI";
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const NavBar = ({setSelectedTrack}) => {
@@ -41,6 +42,7 @@ const NavBar = ({setSelectedTrack}) => {
   const openMenu = Boolean(anchorEl);
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const {setUser} = useContext(UserContext);
 
   const [searchText, setSearchText] = useState("");
 
@@ -111,6 +113,13 @@ const NavBar = ({setSelectedTrack}) => {
     setAnchorEl(null);
   };
 
+  const handleLogout = async() => {
+    const response = await logout();
+    if(response){
+      setUser(false);
+    }
+  }
+
   return (
     <>
      <Drawer open={openSidebar} onClose={handleSideBarClose}>
@@ -154,7 +163,7 @@ const NavBar = ({setSelectedTrack}) => {
             type="text"
             placeholder="Type Here to Search"
             sx={{
-              width:{xs:"10rem"},
+              width:{xs:"10rem",md:"15rem"},
               input: {
                 color: "#d3d3d3",
                 backgroundColor: "#1d1d1d",
@@ -162,7 +171,7 @@ const NavBar = ({setSelectedTrack}) => {
                 "&::placeholder": {
                   color: "#d3d3d3",
                   opacity: 1,
-                  fontSize:{xs:"0.6rem"}
+                  fontSize:{xs:"0.6rem",md:"1rem"}
                 },
               },
               "& .MuiOutlinedInput-root": {
@@ -230,7 +239,7 @@ const NavBar = ({setSelectedTrack}) => {
               <ListItemText>Settings</ListItemText>
             </MenuItem>
             <Divider />
-            <MenuItem onClick={handleClose}>
+            <MenuItem onClick={()=> handleLogout()}>
               <ListItemText>Logout</ListItemText>
             </MenuItem>
           </Menu>
