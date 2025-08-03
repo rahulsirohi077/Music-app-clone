@@ -251,7 +251,7 @@ const NavBar = ({setSelectedTrack}) => {
             anchorEl={searchDataRef.current}
             placement={"bottom"}
             transition
-            sx={{ width: "fit-content" }}
+            sx={{ width: {xs:"10rem",md:"15rem"}}}
           >
             {({ TransitionProps }) => (
               <Fade {...TransitionProps} timeout={350}>

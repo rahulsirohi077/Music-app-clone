@@ -38,6 +38,8 @@ app.get("/",(req,res)=>{
     res.send('hello world');
 })
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 app.listen(PORT,()=>{
     console.log("Server is Listening at",PORT);
 })
