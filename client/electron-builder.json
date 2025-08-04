@@ -1,0 +1,14 @@
+{
+    "appId": "com.example.musicapp",
+    "files":["dist-electron","dist"],
+    "mac":{
+        "target":"dmg"
+    },
+    "linux":{
+        "target":"AppImage",
+        "category":"Utility"
+    },
+    "win":{
+        "target":["portable","msi"]
+    }
+}

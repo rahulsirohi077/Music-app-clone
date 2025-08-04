@@ -69,6 +69,7 @@ const PlayLists = () => {
           width: "100vw",
           display: "flex",
           flexDirection: "column",
+          minHeight: 0,
           p: 2,
         }}
         >
