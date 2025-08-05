@@ -1,7 +1,13 @@
-import { jwt } from "jsonwebtoken";
-import { User } from "../models/user";
+import type { NextFunction, Request, Response } from "express";
+import jwt, { type SignOptions } from "jsonwebtoken";
+import type { JwtPayload } from "../declarations";
+import { User } from "../models/user.js";
 
-const refreshRefreshToken = async (req, res, next) => {
+const refreshRefreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const incomingRefreshToken = req.cookies.refreshToken;
 
@@ -14,8 +20,8 @@ const refreshRefreshToken = async (req, res, next) => {
 
     const decoded = jwt.verify(
       incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
+      process.env.REFRESH_TOKEN_SECRET as string
+    ) as JwtPayload;
 
     const user = await User.findById(decoded.id);
 
@@ -34,13 +40,15 @@ const refreshRefreshToken = async (req, res, next) => {
     }
 
     const newRefreshToken = jwt.sign(
-      { id: user._id },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME }
+      { id: user._id.toString() } as JwtPayload,
+      process.env.REFRESH_TOKEN_SECRET as string,
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME ?? "7d",
+      } as SignOptions
     );
 
     user.refreshToken = newRefreshToken;
-    await user.save()
+    await user.save();
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
@@ -48,13 +56,14 @@ const refreshRefreshToken = async (req, res, next) => {
       secure: true,
     });
 
-    next()
+    next();
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
     return res.status(401).json({
       success: false,
-      message: error.message,
+      message: message,
     });
   }
 };
 
-export {refreshRefreshToken};
+export { refreshRefreshToken };

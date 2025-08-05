@@ -1,6 +1,26 @@
 import esClient from "../elastic-client.js";
+import type { Request, Response } from "express";
+import type { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
 
-const searchTrack = async (req, res) => {
+interface SearchTrackRequestBody {
+  trackTitle?: string;
+}
+
+interface TrackSource {
+  // Add more fields as per your track schema
+  title: string;
+  [key: string]: any;
+}
+
+interface TrackHit {
+  _id: string;
+  _source: TrackSource;
+}
+
+const searchTrack = async (
+  req: Request<{}, {}, SearchTrackRequestBody>,
+  res: Response
+): Promise<Response> => {
   try {
     const { trackTitle } = req.body;
 
@@ -20,7 +40,7 @@ const searchTrack = async (req, res) => {
       body: {
         query: {
           bool: {
-            should: words.map((word) => ({
+            should: words.map((word:string) => ({
               match_phrase: {
                 title: {
                   query: word,
@@ -59,7 +79,7 @@ const searchTrack = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message:"Something Went Wrong while Searching track elastically",
     });
   }
 };

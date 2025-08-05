@@ -1,7 +1,8 @@
 import { PlayList } from "../models/playlist.js";
+import type { Request, Response } from "express";
 
 // Create a new playlist for the user
-const createPlayList = async (req, res) => {
+const createPlayList = async (req: Request, res: Response) => {
   try {
     // fetch data
     const { playListName } = req.body;
@@ -15,7 +16,7 @@ const createPlayList = async (req, res) => {
     // check if playlist already exists for the requesting user
     const playlist = await PlayList.find({
       name: playListName.toLowerCase(),
-      userId: req.user.id,
+      userId: (req.user as any).id,
     });
     // if exist send error res
     if (playlist.length > 0) {
@@ -27,7 +28,7 @@ const createPlayList = async (req, res) => {
     // if not exist, create a new playlist with given credentials
     const newPlaylist = await PlayList.create({
       name: playListName.toLowerCase(),
-      userId: req.user.id,
+      userId: (req.user as any).id,
       tracks: [],
     });
     // after creation send the res 
@@ -39,13 +40,13 @@ const createPlayList = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
 // Add a track to a playlist
-const addToPlaylist = async (req, res) => {
+const addToPlaylist = async (req: Request, res: Response) => {
   try {
     // fetch data
     const { playListId, playListName, trackId } = req.body;
@@ -64,7 +65,7 @@ const addToPlaylist = async (req, res) => {
     if (playListId) {
       playlist = await PlayList.findOne({
         _id: playListId,
-        userId: req.user.id,
+        userId: (req.user as any).id,
       });
       if (!playlist) {
         return res.status(404).json({
@@ -76,14 +77,14 @@ const addToPlaylist = async (req, res) => {
       // If playListName is provided
       playlist = await PlayList.findOne({
         name: playListName,
-        userId: req.user.id,
+        userId: (req.user as any).id,
       });
 
       // If playlist name is "favorites" and doesn't exist, create it
       if (!playlist && playListName.toLowerCase() === "favorites") {
         playlist = await PlayList.create({
           name: "favorites",
-          userId: req.user.id,
+          userId: (req.user as any).id,
           tracks: [],
         });
       }
@@ -97,6 +98,13 @@ const addToPlaylist = async (req, res) => {
       }
     }
 
+    // Check if playlist is defined before using
+    if (!playlist) {
+      return res.status(404).json({
+        success: false,
+        message: "Playlist not found",
+      });
+    }
     // Check if track already exists in playlist
     if (playlist.tracks.includes(trackId)) {
       return res.status(409).json({
@@ -118,13 +126,13 @@ const addToPlaylist = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
 // Remove a track from a playlist
-const removeFromPlayList = async (req, res) => {
+const removeFromPlayList = async (req: Request, res: Response) => {
   try {
     // fetch data
     const { playListId, trackId } = req.body;
@@ -138,7 +146,7 @@ const removeFromPlayList = async (req, res) => {
     // find the playlist for the requesting user
     const playlist = await PlayList.findOne({
       _id: playListId,
-      userId: req.user.id,
+      userId: (req.user as any).id,
     });
     // if playlist not found send error res
     if (!playlist) {
@@ -166,16 +174,16 @@ const removeFromPlayList = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
 // Fetch all playlists for the requesting user
-const fetchAllPlaylists = async (req, res) => {
+const fetchAllPlaylists = async (req: Request, res: Response) => {
   try {
     // fetch all playlists for the user
-    const playlists = await PlayList.find({ userId: req.user.id }).populate("tracks");
+    const playlists = await PlayList.find({ userId: (req.user as any).id }).populate("tracks");
 
     // Add trackCount to each playlist
     const playlistsWithCount = playlists.map(playlist => ({
@@ -191,13 +199,13 @@ const fetchAllPlaylists = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
 // Fetch a particular playlist by playListId for the requesting user
-const fetchPlaylistById = async (req, res) => {
+const fetchPlaylistById = async (req: Request, res: Response) => {
   try {
     // fetch playListId from params or body
     const playListId = req.params.playListId || req.body.playListId;
@@ -211,7 +219,7 @@ const fetchPlaylistById = async (req, res) => {
     // find the playlist for the user
     const playlist = await PlayList.findOne({
       _id: playListId,
-      userId: req.user.id,
+      userId: (req.user as any).id,
     });
     // if playlist not found send error res
     if (!playlist) {
@@ -228,7 +236,7 @@ const fetchPlaylistById = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };

@@ -1,16 +1,18 @@
 import { compare } from "bcrypt";
 import { User } from "../models/user.js";
-import jwt from "jsonwebtoken";
-import fs from 'fs';
-import path from 'path';
+import jwt, { type SignOptions } from "jsonwebtoken";
+import fs from "fs";
+import path from "path";
+import type { Request, Response } from "express";
+import type { IUser, JwtPayload } from "../declarations";
 
 const cookieOptions = {
   httpOnly: true,
-  sameSite: "none",
+  sameSite: "none" as const,
   secure: true,
 };
 
-const login = async (req, res) => {
+const login = async (req: Request, res: Response) => {
   try {
     const { userNameOrEmail, password } = req.body;
 
@@ -45,14 +47,16 @@ const login = async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { id: user._id },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME }
+      { id: user._id.toString() } as JwtPayload,
+      process.env.ACCESS_TOKEN_SECRET || "default_secret",
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME || "1h" } as SignOptions
     );
     const refreshToken = jwt.sign(
-      { id: user._id },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME }
+      { id: user._id.toString() } as JwtPayload,
+      process.env.REFRESH_TOKEN_SECRET || "default_refresh_secret",
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME || "7d",
+      } as SignOptions
     );
 
     user.refreshToken = refreshToken;
@@ -65,17 +69,17 @@ const login = async (req, res) => {
       .json({
         success: true,
         message: "User Logged In Successfully",
-        user
+        user,
       });
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
-const signUp = async (req, res) => {
+const signUp = async (req: Request, res: Response) => {
   try {
     console.log(req.body);
     // fetch data
@@ -107,24 +111,28 @@ const signUp = async (req, res) => {
       });
     }
     // create user entry in the database
-    const user = await User.create({
+    const user = (await User.create({
       username,
       email,
       password,
-    });
+    })) as IUser;
 
     // create payload and sign token
 
     const payload = {
-      id: user._id,
+      id: user._id.toString(),
     };
-    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
-    });
+    const accessToken = jwt.sign(
+      payload as JwtPayload,
+      process.env.ACCESS_TOKEN_SECRET || "default_secret",
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME || "1h" } as SignOptions
+    );
     const refreshToken = jwt.sign(
-      { id: user._id },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME }
+      payload as JwtPayload,
+      process.env.REFRESH_TOKEN_SECRET || "default_refresh_secret",
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME || "7d",
+      } as SignOptions
     );
     user.refreshToken = refreshToken;
     await user.save();
@@ -136,20 +144,23 @@ const signUp = async (req, res) => {
       .json({
         success: true,
         message: "User Sign In Successfully",
-        user
+        user,
       });
   } catch (error) {
     console.log(error);
     return res.status(401).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
-const getUser = async (req, res) => {
+const getUser = async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.user.id).select("-refreshToken");
+    // @ts-ignore
+    const user = await User.findById((req.user as any).id).select(
+      "-refreshToken"
+    );
 
     if (!user) {
       return res.status(401).json({
@@ -166,12 +177,12 @@ const getUser = async (req, res) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
-const refreshTokens = async (req, res) => {
+const refreshTokens = async (req: Request, res: Response) => {
   try {
     const incomingRefreshToken = req.cookies.refreshToken;
 
@@ -184,8 +195,8 @@ const refreshTokens = async (req, res) => {
 
     const decoded = jwt.verify(
       incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
+      process.env.REFRESH_TOKEN_SECRET as string
+    ) as { id: string };
 
     // console.log("decoded = ",decoded)
 
@@ -206,16 +217,16 @@ const refreshTokens = async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { id: user._id },
-      process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
-      }
+      { id: user._id.toString() } as JwtPayload,
+      process.env.ACCESS_TOKEN_SECRET || "default_secret",
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME || "1h" } as SignOptions
     );
     const refreshToken = jwt.sign(
-      { id: user._id },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME }
+      { id: user._id.toString() } as JwtPayload,
+      process.env.REFRESH_TOKEN_SECRET || "default_refresh_secret",
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME || "7d",
+      } as SignOptions
     );
 
     user.refreshToken = refreshToken;
@@ -233,31 +244,38 @@ const refreshTokens = async (req, res) => {
     console.log(error);
     return res.status(401).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
-const updateInfo = async (req, res) => {
+const updateInfo = async (req: Request, res: Response) => {
   try {
     const profilePic = req.file;
     const { username, password } = req.body;
 
-    const user = await User.findById(req.user.id);
-    if (username) {
-      user.username = username;
+    // @ts-ignore
+    const user = await User.findById((req.user as any).id);
+    if (user) {
+      if (username) {
+        user.username = username;
+      }
+      if (password) {
+        user.password = password;
+      }
+      await user.save();
     }
-
-    if (password) {
-      user.password = password;
-    }
-
-    await user.save();
-    console.log("Profile Pic = "+profilePic);
+    console.log("Profile Pic = " + profilePic);
 
     let fileUrl = null;
 
     if (profilePic) {
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found while updating profile picture",
+        });
+      }
       const ext = path.extname(profilePic.originalname);
       const newFileName = user.username + ext;
       const newPath = path.join(profilePic.destination, newFileName);
@@ -269,20 +287,19 @@ const updateInfo = async (req, res) => {
     }
 
     return res.status(200).json({
-      success:true,
-      message:'Information Updated Successfully',
-      profilePicUrl:fileUrl || null
-    })
-
+      success: true,
+      message: "Information Updated Successfully",
+      profilePicUrl: fileUrl || null,
+    });
   } catch (error) {
     return res.status(500).json({
-      success:false,
-      message:error.message
-    })
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 };
 
-const Logout = async (req, res) => {
+const Logout = async (req: Request, res: Response) => {
   return res
     .status(200)
     .cookie("accessToken", "", { ...cookieOptions, maxAge: 0 })

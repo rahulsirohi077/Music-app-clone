@@ -1,10 +1,10 @@
 import { Track } from "../models/track.js";
 import fs from "fs";
 import path from "path";
-// import esClient from "../elastic-client.js";
+import type { Request, Response } from "express";
 
 
-const fetchMusicList = async (req, res) => {
+const fetchMusicList = async (req: Request, res: Response) => {
   try {
     const musicList = await Track.find();
 
@@ -17,7 +17,7 @@ const fetchMusicList = async (req, res) => {
     // console.log(error);
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
@@ -87,7 +87,7 @@ const fetchMusicList = async (req, res) => {
 //   }
 // };
 // my original written search track
-const searchTrack = async (req, res) => {
+const searchTrack = async (req: Request, res: Response) => {
   try {
     const { trackTitle } = req.body;
 
@@ -98,7 +98,7 @@ const searchTrack = async (req, res) => {
       });
     }
 
-    let totalTracks = trackTitle.trim().split(" ").map((word) => {
+    let totalTracks = trackTitle.trim().split(" ").map((word:string) => {
       return Track.find({
         // title: { $regex: word, $options: "i" },
         title: { $regex: `\\b${word}\\b`, $options: "i" },
@@ -137,12 +137,12 @@ const searchTrack = async (req, res) => {
     // console.log(error);
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };
 
-const streamTrack = async (req, res) => {
+const streamTrack = async (req: Request, res: Response) => {
   try {
     const { trackId } = req.params;
 
@@ -193,7 +193,7 @@ const streamTrack = async (req, res) => {
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };

@@ -5,8 +5,19 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.js';
 import trackRoutes from './routes/track.js';
-import playlistRoutes from './routes/playlist.js'
+import playlistRoutes from './routes/playlist.js';
 import path from 'path';
+import type { Request, Response } from 'express';
+import { fileURLToPath } from 'url';
+import { dirname } from "path";
+
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+declare global {
+  var appRoot: string;
+}
 
 global.appRoot = path.resolve();
 
@@ -19,9 +30,13 @@ dotenv.config({
 
 const mongoUri = process.env.MONGO_URL;
 
-connectDB(mongoUri)
+if (!mongoUri) {
+    throw new Error("MONGO_URL environment variable is not defined.");
+}
 
-app.use('/uploads',express.static("public/data/uploads"))
+connectDB(mongoUri);
+
+app.use('/uploads', express.static(path.join(__dirname, '../public/data/uploads')))
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
@@ -34,7 +49,7 @@ app.use("/api/v1/user", userRoutes)
 app.use("/api/v1/track", trackRoutes)
 app.use("/api/v1/playlist",playlistRoutes)
 
-app.get("/",(req,res)=>{
+app.get("/", (req: Request, res: Response) => {
     res.send('hello world');
 })
 
