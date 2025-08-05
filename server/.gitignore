@@ -1,4 +1,4 @@
 node_modules
 elastic-client.js
 dist
-# .env
+.env
