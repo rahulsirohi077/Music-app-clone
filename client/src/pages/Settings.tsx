@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { updateInfo } from "../apis/userAPI";
 import AppLayout from "../components/layout/AppLayout";
+import { SettingsFormData } from "../types";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -36,9 +37,9 @@ const Settings = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
@@ -59,9 +60,9 @@ const Settings = () => {
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm();
+  } = useForm<SettingsFormData>();
 
-  const handleModification = async (data) => {
+  const handleModification = async (data: SettingsFormData) => {
     const formData = new FormData();
 
     const file = data.file[0];
@@ -122,7 +123,7 @@ const Settings = () => {
             >
               <Avatar
                 alt="Uploaded Preview"
-                src={selectedImage}
+                src={selectedImage ?? undefined}
                 sx={{
                   width: "8rem",
                   height: "8rem",

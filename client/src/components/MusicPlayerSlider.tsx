@@ -1,20 +1,16 @@
-import {
-  FastForwardRounded,
-  FastRewindRounded,
-  PauseRounded,
-  PlayArrowRounded,
-} from "@mui/icons-material";
-import { Box, IconButton, Slider, Stack, Typography } from "@mui/material";
+import { Slider, Stack, Typography } from "@mui/material";
+import React from "react";
+import type { MusicPlayerSliderProps } from "../types";
 
-const MusicPlayerSlider = ({ value, max, onChange }) => {
-  const duration = Math.floor(max); // seconds
-  // console.log("max = ", max)
-  // console.log("value = ", value)
-  function formatDuration(value) {
+const MusicPlayerSlider: React.FC<MusicPlayerSliderProps> = ({ value, max, onChange }) => {
+  const duration = Math.floor(max);
+
+  function formatDuration(value: number): string {
     const minute = Math.floor(value / 60);
     const secondLeft = value - minute * 60;
     return `${minute}:${secondLeft < 10 ? `0${secondLeft}` : secondLeft}`;
   }
+
   return (
     <Stack
       width={"100%"}
@@ -33,9 +29,7 @@ const MusicPlayerSlider = ({ value, max, onChange }) => {
         min={0}
         step={1}
         max={max}
-        onChange={(_, value) => {
-          onChange(_, value);
-        }}
+        onChange={onChange}
         sx={() => ({
           maxWidth: { sm: "50%", md: "60%", xs: "50%" },
         })}

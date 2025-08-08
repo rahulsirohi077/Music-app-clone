@@ -163,7 +163,7 @@ const removeFromPlayList = async (req: Request, res: Response) => {
       });
     }
     // remove track from playlist
-    playlist.tracks = playlist.tracks.filter(id => id.toString() !== trackId.toString());
+    playlist.tracks = playlist.tracks.filter((id: { toString: () => any; }) => id.toString() !== trackId.toString());
     await playlist.save();
     // after removal send the res
     return res.status(200).json({

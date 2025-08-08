@@ -5,21 +5,24 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { login } from '../apis/userAPI'
 import { useForm } from 'react-hook-form'
 import { UserContext } from '../context/UserContext'
+import { LoginFormData } from '../types'
 
 const Login = () => {
-    const {setUser} = useContext(UserContext);
+    const userContext = useContext(UserContext);
+    if (!userContext) throw new Error("UserContext is not available.");
+    const { setUser } = userContext;
     const navigate = useNavigate();
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting},
-      } = useForm();
+        formState: { errors, isSubmitting },
+      } = useForm<LoginFormData>();
 
     const [showPassword, setShowPassword] = useState(false);
     
 
-    const handleLogin = async(data) => {
-        console.log("data=> ",data)
+    const handleLogin = async(data: LoginFormData) => {
+        // console.log("data=> ",data)
         await login(data,navigate,setUser)
     }
 
@@ -72,7 +75,7 @@ const Login = () => {
                             variant='outlined'
                             type={showPassword ? "text" : "password"}
                             {...register('password',{required:"Password is Required"})}
-                            error={errors?.password}
+                            error={!!errors.password}
                             helperText={errors?.password?.message}
                             aria-invalid={!!errors.password}
                             slotProps={{

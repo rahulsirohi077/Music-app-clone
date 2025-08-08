@@ -19,12 +19,18 @@ import {
   PlayArrowRounded,
 } from "@mui/icons-material";
 import { trackEndpoints } from "../apis/apis";
+import type { Track } from "../types";
+
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
-const Player = ({ selectedTrack }) => {
+interface PlayerProps {
+  selectedTrack: Track | null;
+}
+
+const Player: React.FC<PlayerProps> = ({ selectedTrack }) => {
   const [paused, setPaused] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const hasInteracted = useRef(false); // Track if user has pressed play at least once
 
   // Handle audio reset and timeupdate when selectedTrack changes
@@ -85,11 +91,12 @@ const Player = ({ selectedTrack }) => {
   }, [selectedTrack, paused]);
 
   // Handle slider change
-  const handleSliderChange = (event, value) => {
+  const handleSliderChange = (_event: Event, value: number | number[]) => {
     const audio = audioRef.current;
+    const newValue = Array.isArray(value) ? value[0] : value;
     if (audio) {
-      audio.currentTime = value;
-      setCurrentTime(value);
+      audio.currentTime = newValue;
+      setCurrentTime(newValue);
     }
   };
 
@@ -111,7 +118,8 @@ const Player = ({ selectedTrack }) => {
     };
   }, [selectedTrack]);
 
-  if(!selectedTrack) return (<Typography align="center">Please Select a track</Typography>)
+  if (!selectedTrack)
+    return <Typography align="center">Please Select a track</Typography>;
 
   return (
     <Stack
@@ -122,7 +130,7 @@ const Player = ({ selectedTrack }) => {
     >
       <audio
         ref={audioRef}
-        src={`${trackEndpoints.STREAM_MUSIC_API}/${selectedTrack?._id}`} 
+        src={`${trackEndpoints.STREAM_MUSIC_API}/${selectedTrack?._id}`}
         preload="metadata"
       />
       <Container

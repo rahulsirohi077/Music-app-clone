@@ -1,5 +1,5 @@
 import mongoose, { Model, model, Schema } from "mongoose";
-import type { ITrack } from "../declarations";
+import type { ITrack } from "../declarations.js";
 
 const trackSchema = new Schema<ITrack>({
   title: { 

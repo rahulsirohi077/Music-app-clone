@@ -1,5 +1,5 @@
 import mongoose, { model, Schema, Types, Document, Model } from "mongoose";
-import type { IPlaylist } from "../declarations";
+import type { IPlaylist } from "../declarations.js";
 
 const playlistSchema = new Schema<IPlaylist>({
   name: { 

@@ -1,25 +1,28 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster, toast } from "react-hot-toast";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "./context/UserContext";
+import { Toaster, toast } from "react-hot-toast";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { getUser } from "./apis/userAPI";
+import { UserContext } from "./context/UserContext";
 
+import ProtectRoute from "./components/auth/ProtectRoute";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
-import ProtectRoute from "./components/auth/ProtectRoute";
-import Settings from "./pages/Settings";
 import PlayList from "./pages/PlayList";
-import AppLayout from "./components/layout/AppLayout";
+import Settings from "./pages/Settings";
+import SignUp from "./pages/SignUp";
 
 function App() {
-  const { user, setUser } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+
+  if (!userContext) {
+    throw new Error("UserContext is not available.");
+  }
+
+  const { user, setUser } = userContext;
   const [loading, setLoading] = useState(true);
-  // console.log("User => ",user)
 
   useEffect(() => {
-    // console.log("use Effect ran")
-    let toastId;
+    let toastId: string;
     const getUserInfo = async () => {
       toastId = toast.loading("Loading...");
       await getUser(setUser);
@@ -38,7 +41,7 @@ function App() {
       ) : (
         <BrowserRouter>
           <Routes>
-            <Route element={<ProtectRoute user={user} />}>
+            <Route element={<ProtectRoute user={user ? user:false} />}>
               <Route element={<Home />} path="/" />
               <Route element={<Settings />} path="/settings" />
               <Route element={<PlayList />} path="/playlists" />

@@ -24,25 +24,27 @@ import Player from "../components/Player";
 import { fetchMusicList } from "../apis/trackAPI";
 import { createPlayList, addToPlaylist } from "../apis/playlistAPI";
 import BottomPlayerBar from "../components/BottomPlayerBar";
+import type { Track } from "../types";
+
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const Home = () => {
   const [liked, setLiked] = useState(false);
-  const [chartsData, setChartsData] = useState([]);
-  const [selectedTrack, setSelectedTrack] = useState(null);
+  const [chartsData, setChartsData] = useState<Track[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
 
   // Modal state for adding to playlist
   const [modalOpen, setModalOpen] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
-  const [trackToAdd, setTrackToAdd] = useState(null);
+  const [trackToAdd, setTrackToAdd] = useState<Track | null>(null);
   const [isCreating, setIsCreating] = useState(false); // for create playlist mode
-  const playlistInputRef = useRef(null);
+  const playlistInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const fetchMusic = async () => {
       const response = await fetchMusicList();
       setChartsData(response?.musicList || []);
-      setSelectedTrack(response?.musicList[0]);
+      setSelectedTrack(response?.musicList?.[0] ?? null);
     };
     fetchMusic();
   }, []);
@@ -54,7 +56,7 @@ const Home = () => {
     }
   }, [modalOpen, isCreating]);
 
-  function formatDuration(value) {
+  function formatDuration(value: number): string {
     const minute = Math.floor(value / 60);
     const secondLeft = value - minute * 60;
     return `${minute}:${secondLeft < 10 ? `0${secondLeft}` : secondLeft}`;
@@ -82,14 +84,14 @@ const Home = () => {
 
   return (
     <Stack sx={{ height: "100vh" }}>
-      <NavBar setSelectedTrack={setSelectedTrack}/>
+      <NavBar setSelectedTrack={setSelectedTrack} />
       <Container
         maxWidth={false}
         component="main"
         sx={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
       >
         {/* hero Section */}
-        <Stack spacing={{xs:1,md:3}}>
+        <Stack spacing={{ xs: 1, md: 3 }}>
           <Typography variant="body1">Trending New Hits</Typography>
 
           <Stack>
@@ -133,7 +135,7 @@ const Home = () => {
 
         <Grid
           container
-          spacing={{xs:1,md:2}}
+          spacing={{ xs: 1, md: 2 }}
           mt={2}
           mb={2}
           sx={{
@@ -143,20 +145,19 @@ const Home = () => {
         >
           {/* left section */}
           <Grid
-            container
             // item
-            size={{xs:12,md:7}}
-            spacing={{xs:1,md:2}}
-            height={{xs:"85%",md:"100%"}}
+            container
+            size={{ xs: 12, md: 7 }}
+            spacing={{ xs: 1, md: 2 }}
+            height={{ xs: "85%", md: "100%", }}
             direction={"column"}
           >
             {/* Artist section */}
             <Grid
-              item
               size={12}
               bgcolor={"#212028"}
               sx={{
-                height:{xs:'30%',md:"35%"},
+                height: { xs: '30%', md: "35%" },
                 // height:"fit-content"
               }}
               direction={"column"}
@@ -181,15 +182,14 @@ const Home = () => {
                   aria-activedescendant="card-0"
                 >
                   {artistData.map((data, ind) => (
-                    <CardItem
-                      id={`card-${ind}`}
-                      key={data.id}
-                      src={data.src}
-                      alt={data.alt}
-                      artistName={data.artistName}
-                      plays={data.plays}
-                      tabIndex={0}
-                    />
+                    <div id={`card-${ind}`} key={data.id} tabIndex={0} style={{height:"100%"}}>
+                      <CardItem
+                        src={data.src}
+                        alt={data.alt}
+                        artistName={data.artistName}
+                        plays={data.plays}
+                      />
+                    </div>
                   ))}
                 </Box>
               </Stack>
@@ -197,7 +197,7 @@ const Home = () => {
             {/* genre and top charts */}
             <Grid
               container
-              spacing={{xs:1,md:3}}
+              spacing={{ xs: 1, md: 3 }}
               size={12}
               direction={"row"}
               height={"60%"}
@@ -208,7 +208,7 @@ const Home = () => {
             >
               {/* genre */}
               <Grid
-                size={{xs:3,md:5}}
+                size={{ xs: 3, md: 5 }}
                 bgcolor={"#212028"}
                 borderRadius={3}
                 height={"100%"}
@@ -217,7 +217,7 @@ const Home = () => {
                   padding: 1,
                   display: "flex",
                   flexDirection: "column",
-                  overflow:"auto",
+                  overflow: "auto",
                 }}
                 tabIndex={0}
                 aria-labelledby="genre"
@@ -234,16 +234,15 @@ const Home = () => {
                     overflow: "auto",
                     mt: 0,
                     "&::-webkit-scrollbar": {
-                    display: "none",
-                  },
-                  scrollbarWidth: "none",
-                  msOverflowStyle: "none",
+                      display: "none",
+                    },
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
                   }}
                 >
                   {genreData.map((data) => (
                     <Grid
-                      item
-                      size={{xs:12,md:6}}
+                      size={{ xs: 12, md: 6 }}
                       key={data.id}
                       bgcolor={data.bgColor}
                       borderRadius={3}
@@ -265,11 +264,10 @@ const Home = () => {
               </Grid>
               {/* top charts */}
               <Grid
-                item
-                size={{xs:9,md:7}}
+                size={{ xs: 9, md: 7 }}
                 bgcolor={"#212028"}
                 py={2}
-                paddingLeft={{xs:1,md:2}}
+                paddingLeft={{ xs: 1, md: 2 }}
                 paddingRight={2}
                 borderRadius={3}
                 height={"100%"}
@@ -300,7 +298,7 @@ const Home = () => {
                       justifyContent={"space-between"}
                       mt={1}
                     >
-                      <Grid size={1} sx={{display:"flex",justifyContent:"flex-start",alignItems:"center"}}>
+                      <Grid size={1} sx={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
                         <Typography variant="overline">{index + 1}</Typography>
                       </Grid>
                       <Grid size={6}>
@@ -313,11 +311,11 @@ const Home = () => {
                               width: { xs: 30, md: 50 },
                               height: { xs: 20, md: 30 }, // example responsive height
                               objectFit: "cover",
-                              alignSelf:"center"
+                              alignSelf: "center"
                             }}
                           />
                           <Stack direction={"column"}>
-                            <Typography variant="body2" sx={{fontSize:{xs:"0.7rem"}}}>
+                            <Typography variant="body2" sx={{ fontSize: { xs: "0.7rem" } }}>
                               {data.title}
                             </Typography>
                             <Typography
@@ -351,7 +349,7 @@ const Home = () => {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          gap:{xs:0,md:1}
+                          gap: { xs: 0, md: 1 }
                         }}
                       >
                         <IconButton
@@ -360,7 +358,7 @@ const Home = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            marginLeft:2
+                            marginLeft: 2
                           }}
                           aria-label={`Play ${data.title} by ${
                             data.artist
@@ -395,14 +393,13 @@ const Home = () => {
           {/* right section */}
           {/* Player */}
           <Grid
-            item
             size={5}
             bgcolor={"#212028"}
             height={"100%"}
             borderRadius={3}
             tabIndex={0}
             aria-labelledby="player-heading"
-            display={{xs:"none",md:"block"}}
+            display={{ xs: "none", md: "block" }}
           >
             <Stack height={"100%"}>
               <Typography

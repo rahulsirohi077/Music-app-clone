@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { type SignOptions } from "jsonwebtoken";
-import type { JwtPayload } from "../declarations";
+import type { JwtPayload } from "../declarations.ts";
 import { User } from "../models/user.js";
 
 const refreshRefreshToken = async (

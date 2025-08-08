@@ -4,7 +4,7 @@ import jwt, { type SignOptions } from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 import type { Request, Response } from "express";
-import type { IUser, JwtPayload } from "../declarations";
+import type { IUser, JwtPayload } from "../declarations.js";
 
 const cookieOptions = {
   httpOnly: true,

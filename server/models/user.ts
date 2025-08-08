@@ -1,7 +1,7 @@
 import { hash } from "bcrypt";
 import mongoose, { model, Schema, Types } from "mongoose";
 import type { Model } from "mongoose";
-import type { IUser } from "../declarations";
+import type { IUser } from "../declarations.js";
 
 const userSchema = new Schema<IUser>({
   username: { 

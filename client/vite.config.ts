@@ -23,6 +23,14 @@ export default defineConfig({
     })
   ],
   base: './',
+  server: {
+    watch: {
+      usePolling: true, // sometimes needed if file system events are missed
+    },
+    hmr: {
+      overlay: true // show errors in browser
+    }
+  }
   // build: {
   //   outDir: 'dist-react',
   //   emptyOutDir: true

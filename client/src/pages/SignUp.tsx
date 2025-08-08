@@ -13,9 +13,12 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { signUp } from "../apis/userAPI";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../context/UserContext";
+import { SignUpFormData } from "../types";
 
 const SignUp = () => {
-  const {setUser} = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  if (!userContext) throw new Error("UserContext is not available.");
+  const { setUser } = userContext;
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -26,10 +29,9 @@ const SignUp = () => {
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm();
+  } = useForm<SignUpFormData>();
 
-  const handleSignUp = async (data) => {
-    // console.log(data);
+  const handleSignUp = async (data: SignUpFormData) => {
     await signUp(data, navigate, setUser);
   };
 

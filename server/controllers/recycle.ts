@@ -1,6 +1,6 @@
 import esClient from "../elastic-client.js";
 import type { Request, Response } from "express";
-import type { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
+// import type { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
 
 interface SearchTrackRequestBody {
   trackTitle?: string;

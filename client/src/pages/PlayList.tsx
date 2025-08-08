@@ -1,32 +1,30 @@
-import React, { useEffect, useState, useContext } from "react";
-import AppLayout from "../components/layout/AppLayout";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import {
   Box,
-  Container,
-  Typography,
   Card,
   CardContent,
-  Stack,
+  Container,
   Grid,
   IconButton,
+  Stack,
+  Typography,
 } from "@mui/material";
 import { blue, grey } from "@mui/material/colors";
-import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import Player from "../components/Player";
+import { useEffect, useState } from "react";
 import { fetchAllPlaylists } from "../apis/playlistAPI";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import MenuIcon from "@mui/icons-material/Menu";
 import BottomPlayerBar from "../components/BottomPlayerBar";
-import { UserContext } from "../context/UserContext";
+import AppLayout from "../components/layout/AppLayout";
+import Player from "../components/Player";
 import NavBar from "../components/shared/NavBar";
+import type { Playlist, Track } from "../types";
 
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
 const PlayLists = () => {
-  const [playlists, setPlaylists] = useState([]);
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
-  const [selectedTrack, setSelectedTrack] = useState(null);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
 
 
   useEffect(() => {
@@ -39,19 +37,19 @@ const PlayLists = () => {
     fetchPlaylistsData();
   }, []);
 
-  function formatDuration(value) {
+  function formatDuration(value: number): string {
     const minute = Math.floor(value / 60);
     const secondLeft = value - minute * 60;
     return `${minute}:${secondLeft < 10 ? `0${secondLeft}` : secondLeft}`;
   }
 
-  const handlePlaylistSelect = (playlist) => {
+  const handlePlaylistSelect = (playlist: Playlist) => {
     setSelectedPlaylist(playlist);
   };
 
-  const handleOnKeyDown = (e) => {
+  const handleOnKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" || e.key === " ") {
-      e.target.click();
+      (e.target as HTMLElement).click();
     }
   };
 
@@ -61,14 +59,14 @@ const PlayLists = () => {
   };
 
   return (
-    <>
+    <Stack sx={{height:"100vh"}}>
       <NavBar setSelectedTrack={setSelectedTrack}/>
       <Container
         sx={{
-          height: "93vh",
-          width: "100vw",
+          // width: "100vw",
           display: "flex",
           flexDirection: "column",
+          flex:1,
           minHeight: 0,
           p: 2,
         }}
@@ -147,7 +145,6 @@ const PlayLists = () => {
             {/* Playlists Tracks Section */}
             <Grid size={{ xs: 12, md: 6 }}>
               <Grid
-                item
                 size={12}
                 bgcolor={"#212028"}
                 padding={2}
@@ -177,43 +174,45 @@ const PlayLists = () => {
                       No Tracks In This Playlist
                     </Typography>
                   ) : (
-                    selectedPlaylist.tracks.map((data, index) => (
-                      <Grid
-                        container
-                        key={index + 1}
-                        direction={"row"}
-                        width={"100%"}
-                        justifyContent={"space-between"}
-                        mt={1}
-                      >
-                        <Grid size={1}>
-                          <Typography variant="overline">
-                            {index + 1}
-                          </Typography>
-                        </Grid>
-                        <Grid size={7}>
-                          <Stack direction={"row"} spacing={2} width={"full"}>
-                            <img
-                              src={STATIC_URL + data.thumbnailUrl}
-                              alt={`${data.title} Thumbnail`}
-                              width={50}
-                              height={30}
-                              style={{ objectFit: "cover" }}
-                            />
-                            <Stack direction={"column"}>
-                              <Typography variant="body2">
-                                {data.title}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                sx={{ fontSize: "0.5rem" }}
-                                width={"100%"}
-                              >
-                                {data?.artist && data?.artist.slice(0, 16)}
-                              </Typography>
+                    selectedPlaylist.tracks
+                      .filter((data): data is Track => typeof data !== "string")
+                      .map((data, index) => (
+                        <Grid
+                          container
+                          key={index + 1}
+                          direction={"row"}
+                          width={"100%"}
+                          justifyContent={"space-between"}
+                          mt={1}
+                        >
+                          <Grid size={1}>
+                            <Typography variant="overline">
+                              {index + 1}
+                            </Typography>
+                          </Grid>
+                          <Grid size={7}>
+                            <Stack direction={"row"} spacing={2} width={"full"}>
+                              <img
+                                src={STATIC_URL + data.thumbnailUrl}
+                                alt={`${data.title} Thumbnail`}
+                                width={50}
+                                height={30}
+                                style={{ objectFit: "cover" }}
+                              />
+                              <Stack direction={"column"}>
+                                <Typography variant="body2">
+                                  {data.title}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ fontSize: "0.5rem" }}
+                                  width={"100%"}
+                                >
+                                  {data?.artist && data?.artist.slice(0, 16)}
+                                </Typography>
+                              </Stack>
                             </Stack>
-                          </Stack>
-                        </Grid>
+                          </Grid>
                         <Grid size={2}>
                           <Typography
                             width={"100%"}
@@ -275,7 +274,6 @@ const PlayLists = () => {
             </Grid>
             {/* Music Player Section */}
             <Grid
-              item
               size={6}
               bgcolor={"#212028"}
               height={"100%"}
@@ -304,7 +302,7 @@ const PlayLists = () => {
           <BottomPlayerBar selectedTrack={selectedTrack} />
         )}
       </Container>
-    </>
+    </Stack>
   );
 };
 

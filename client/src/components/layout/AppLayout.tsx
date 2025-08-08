@@ -4,14 +4,14 @@ import SideBar from "../shared/SideBar";
 import { UserContext } from "../../context/UserContext";
 
 // eslint-disable-next-line no-unused-vars
-const AppLayout = (WrappedComponent) => {
+function AppLayout<P>(WrappedComponent: React.ComponentType<P>) {
   // const { openSideBar, setOpenSideBar } = useContext(UserContext);
 
   // const handleSideBarClose = () => {
   //   setOpenSideBar(false);
   // };
 
-  return (props) => (
+  return (props: React.PropsWithChildren<P>) => (
     <>
       {/* Drawer */}
       {/* <Drawer open={openSideBar} onClose={handleSideBarClose}>
@@ -20,7 +20,6 @@ const AppLayout = (WrappedComponent) => {
       {/* main app layout */}
       <Grid container height={"100vh"} color={"#ececee"}>
         <Grid
-          item
           size={2}
           height={"100%"}
           bgcolor={"#18171c"}
@@ -29,7 +28,6 @@ const AppLayout = (WrappedComponent) => {
           <SideBar />
         </Grid>
         <Grid
-          item
           size={{ sm: 12, md: 10 }}
           height={"100%"}
           sx={{

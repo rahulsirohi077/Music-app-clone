@@ -6,13 +6,18 @@ import FastRewindRounded from "@mui/icons-material/FastRewindRounded";
 import FastForwardRounded from "@mui/icons-material/FastForwardRounded";
 import MusicPlayerSlider from "./MusicPlayerSlider";
 import { trackEndpoints } from "../apis/apis";
+import type { Track } from "../types";
 
 const STATIC_URL = import.meta.env.VITE_APP_STATIC_URL;
 
-const BottomPlayerBar = ({ selectedTrack }) => {
+interface BottomPlayerBarProps {
+  selectedTrack: Track | null;
+}
+
+const BottomPlayerBar: React.FC<BottomPlayerBarProps> = ({ selectedTrack }) => {
   const [paused, setPaused] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const hasInteracted = useRef(false);
 
   // Reset audio and time when track changes, and auto-play if user interacted
@@ -83,11 +88,12 @@ const BottomPlayerBar = ({ selectedTrack }) => {
     };
   }, [selectedTrack, paused]);
 
-  const handleSliderChange = (_, value) => {
+  const handleSliderChange = (_: Event, value: number | number[]) => {
     const audio = audioRef.current;
+    const newValue = Array.isArray(value) ? value[0] : value;
     if (audio) {
-      audio.currentTime = value;
-      setCurrentTime(value);
+      audio.currentTime = newValue;
+      setCurrentTime(newValue);
     }
   };
 
