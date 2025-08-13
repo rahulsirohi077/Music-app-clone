@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { FormEvent, useContext, useEffect, useState } from "react";
 import {
   Button,
   Container,
@@ -14,6 +14,7 @@ import { signUp } from "../apis/userAPI";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../context/UserContext";
 import { SignUpFormData } from "../types";
+import { UnsavedChangesWrapper } from "../components/wrapper/UnsavedChangesWrapper";
 
 const SignUp = () => {
   const userContext = useContext(UserContext);
@@ -21,6 +22,7 @@ const SignUp = () => {
   const { setUser } = userContext;
   const navigate = useNavigate();
 
+  const [hasChanged, setHasChanged] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -34,6 +36,29 @@ const SignUp = () => {
   const handleSignUp = async (data: SignUpFormData) => {
     await signUp(data, navigate, setUser);
   };
+
+  const handleOnChange = (e: FormEvent) => {
+    const data = new FormData(e.currentTarget as HTMLFormElement);
+    const values = Array.from(data.values());
+    const changedFields = values.filter(value =>
+      typeof value === "string" ? value.length > 0 : value.size > 0 
+    );
+    console.log(changedFields);
+    setHasChanged(Boolean(changedFields.length > 0));
+  }
+
+  // useEffect(()=>{
+  //   if(!hasChanged) return;
+  //   const handleOnUnload = (e:BeforeUnloadEvent) => {
+  //     e.preventDefault();
+  //     return '';
+  //   }
+  //   window.addEventListener('beforeunload',handleOnUnload,true)
+
+  //   return () => {
+  //     window.removeEventListener('beforeunload',handleOnUnload,true)
+  //   }
+  // },[hasChanged])
 
   return (
     <div>
@@ -59,12 +84,14 @@ const SignUp = () => {
           }}
         >
           <Typography variant="h5">Sign Up</Typography>
+          <UnsavedChangesWrapper when={hasChanged}>
           <form
             style={{
               marginTop: "1rem",
               width: "100%",
             }}
             onSubmit={handleSubmit(handleSignUp)}
+            onChange={handleOnChange}
           >
             {/* username field */}
             <InputLabel htmlFor="username">Username</InputLabel>
@@ -192,10 +219,24 @@ const SignUp = () => {
             <Typography textAlign={"center"} m={"0.5rem"}>
               Or
             </Typography>
-            <Button fullWidth variant="outlined" href="/login">
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => {
+                // if (hasChanged) {
+                //   // show unsavedmodal = true/false 
+                //   const confirmLeave = window.confirm(
+                //     "You have unsaved changes. Are you sure you want to leave?"
+                //   );
+                //   if (!confirmLeave) return;
+                // }
+                navigate('/login');
+              }}
+            >
               Login Instead
             </Button>
           </form>
+          </UnsavedChangesWrapper>
         </Paper>
       </Container>
     </div>
